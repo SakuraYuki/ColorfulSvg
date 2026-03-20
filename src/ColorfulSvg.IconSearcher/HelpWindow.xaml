@@ -1,0 +1,126 @@
+<Window x:Class="ColorfulSvg.IconSearcher.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="使用说明"
+        Icon="Assets/App.ico"
+        Width="680"
+        Height="560"
+        MinWidth="620"
+        MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        FontFamily="Microsoft YaHei UI"
+        Background="#F4F7FB">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="18" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="18" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="18" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Padding="24"
+                    CornerRadius="24">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#0F172A" Offset="0" />
+                        <GradientStop Color="#164E9A" Offset="0.55" />
+                        <GradientStop Color="#128C8A" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <StackPanel>
+                    <TextBlock FontSize="28"
+                               FontWeight="SemiBold"
+                               Foreground="White"
+                               Text="IconSearcher 使用说明" />
+                    <TextBlock Margin="0,12,0,0"
+                               FontSize="14"
+                               Foreground="#DCE8FF"
+                               TextWrapping="Wrap"
+                               Text="通过 yesicon 搜索图标，直接把 SVG 转成 WPF 可用的 DrawingImage 资源，并导出为 ResourceDictionary。" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="2"
+                    Padding="20"
+                    Background="White"
+                    BorderBrush="#DCE4EF"
+                    BorderThickness="1"
+                    CornerRadius="20">
+                <StackPanel>
+                    <TextBlock FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="#0F172A"
+                               Text="推荐工作流" />
+                    <TextBlock Margin="0,14,0,0"
+                               Foreground="#475569"
+                               Text="1. 在主界面左上输入关键词，打开 yesicon 搜索页。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="2. 普通点击图标可进入详情页，右下方会显示当前图标预览。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="3. 按住 Ctrl 会自动进入快速选取模式，直接点击图标可把它加入右侧导出列表。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="4. 在右侧为每个图标调整资源键名，选择导出模式和输出文件。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="5. 点击“导出选中资源”，生成可直接合并到 WPF 的 XAML 资源字典。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="6. 浏览器会记住上次停留的 yesicon 页面，下次打开时会自动恢复。" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="4"
+                    Padding="20"
+                    Background="White"
+                    BorderBrush="#DCE4EF"
+                    BorderThickness="1"
+                    CornerRadius="20">
+                <StackPanel>
+                    <TextBlock FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="#0F172A"
+                               Text="操作提示" />
+                    <TextBlock Margin="0,14,0,0"
+                               Foreground="#475569"
+                               Text="按住 Ctrl：开启快速选取模式，点击图标直接加入右侧。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="松开 Ctrl：退出快速选取模式，恢复普通浏览。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="工作区：可从“视图”菜单或右下角按钮打开，工作区会以悬浮面板方式显示。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="右侧已选列表：支持修改资源键名、删除单个图标、批量导出。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="顶部说明已精简；需要查看完整用法时，可随时从“帮助 -> 使用说明”打开本页。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="追加导出：如果目标文件里已有同名资源，会逐项提示覆盖或跳过。" />
+                </StackPanel>
+            </Border>
+
+            <StackPanel Grid.Row="6"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button Width="120"
+                        Padding="14,10"
+                        Click="Close_Click"
+                        Background="#0F5FFF"
+                        BorderThickness="0"
+                        Foreground="White"
+                        FontWeight="SemiBold"
+                        Content="关闭" />
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Window>

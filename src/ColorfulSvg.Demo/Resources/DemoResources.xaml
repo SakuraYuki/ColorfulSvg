@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <DrawingImage x:Key="status/info">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Brush="#FF2563EB" Geometry="F1 M8.5,1.5 C4.63,1.5 1.5,4.63 1.5,8.5 1.5,12.37 4.63,15.5 8.5,15.5 12.37,15.5 15.5,12.37 15.5,8.5 15.5,4.63 12.37,1.5 8.5,1.5 z" />
+                    <GeometryDrawing Brush="White" Geometry="F1 M7.7,7.2 L9.3,7.2 9.3,12 7.7,12 z" />
+                    <GeometryDrawing Brush="White" Geometry="F1 M7.7,4.7 A0.8,0.8 0 1 1 9.3,4.7 A0.8,0.8 0 1 1 7.7,4.7 z" />
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="folder/open">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Brush="#FFF4C36A" Geometry="F1 M2,5 L6,5 7.5,3 14,3 C14.55,3 15,3.45 15,4 L15,6 2,6 z" />
+                    <GeometryDrawing Brush="#FF6AADE4" Geometry="F1 M2,5.5 L14.5,5.5 C15.33,5.5 16,6.17 16,7 L16,13 C16,13.83 15.33,14.5 14.5,14.5 L2.5,14.5 C1.67,14.5 1,13.83 1,13 L1,7 C1,6.17 1.67,5.5 2.5,5.5 z" />
+                    <GeometryDrawing Brush="#FF9ED0FF" Geometry="F1 M2.3,6.6 L14.2,6.6 13.1,12.9 1.4,12.9 z" />
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="status/warning">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Brush="#FFFFC83D" Geometry="F1 M9,1.5 L16.3,14.5 1.7,14.5 z" />
+                    <GeometryDrawing Brush="#FF704B00" Geometry="F1 M8.2,5 L9.8,5 9.4,10.2 8.6,10.2 z" />
+                    <GeometryDrawing Brush="#FF704B00" Geometry="F1 M8.2,11.5 A0.8,0.8 0 1 1 9.8,11.5 A0.8,0.8 0 1 1 8.2,11.5 z" />
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <DrawingImage x:Key="action/check">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Brush="#FF3CCB7F" Geometry="F1 M8.5,1.5 C4.63,1.5 1.5,4.63 1.5,8.5 1.5,12.37 4.63,15.5 8.5,15.5 12.37,15.5 15.5,12.37 15.5,8.5 15.5,4.63 12.37,1.5 8.5,1.5 z" />
+                    <GeometryDrawing Brush="White" Geometry="F1 M6.9,11.6 4.2,8.9 5.3,7.8 6.9,9.4 11.6,4.7 12.7,5.8 z" />
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+</ResourceDictionary>

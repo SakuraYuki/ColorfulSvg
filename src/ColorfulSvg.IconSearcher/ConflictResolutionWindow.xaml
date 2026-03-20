@@ -1,0 +1,74 @@
+<Window x:Class="ColorfulSvg.IconSearcher.ConflictResolutionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="资源键冲突"
+        Icon="Assets/App.ico"
+        Width="520"
+        Height="290"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="#F5F7FB">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="14" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock FontSize="24"
+                   FontWeight="SemiBold"
+                   Foreground="#0F172A"
+                   Text="检测到资源键冲突" />
+
+        <TextBlock Grid.Row="2"
+                   Foreground="#475569"
+                   TextWrapping="Wrap">
+            当前输出文件里已经存在相同的资源键。请选择这一次冲突应该如何处理。
+        </TextBlock>
+
+        <Border Grid.Row="4"
+                Padding="16"
+                Background="White"
+                BorderBrush="#DCE4EF"
+                BorderThickness="1"
+                CornerRadius="18">
+            <StackPanel>
+                <TextBlock FontWeight="SemiBold"
+                           Foreground="#0F172A"
+                           Text="{Binding ResourceKey, StringFormat=资源键：{0}}" />
+                <TextBlock Margin="0,8,0,0"
+                           Foreground="#475569"
+                           Text="{Binding SourceId, StringFormat=来源图标：{0}}" />
+            </StackPanel>
+        </Border>
+
+        <UniformGrid Grid.Row="6"
+                     Columns="3"
+                     Rows="2">
+            <Button Margin="0,0,12,12"
+                    Padding="12,10"
+                    Click="Overwrite_Click"
+                    Content="覆盖本项" />
+            <Button Margin="0,0,12,12"
+                    Padding="12,10"
+                    Click="Skip_Click"
+                    Content="跳过本项" />
+            <Button Margin="0,0,0,12"
+                    Padding="12,10"
+                    Click="Cancel_Click"
+                    Content="取消导出" />
+            <Button Margin="0,0,12,0"
+                    Padding="12,10"
+                    Click="OverwriteAll_Click"
+                    Content="全部覆盖" />
+            <Button Margin="0,0,12,0"
+                    Padding="12,10"
+                    Click="SkipAll_Click"
+                    Content="全部跳过" />
+        </UniformGrid>
+    </Grid>
+</Window>

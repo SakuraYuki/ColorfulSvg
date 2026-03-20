@@ -1,0 +1,798 @@
+<Window x:Class="ColorfulSvg.Demo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="ColorfulSvg 演示"
+        Width="1240"
+        Height="860"
+        MinWidth="1080"
+        MinHeight="760"
+        FontFamily="Microsoft YaHei UI"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#475569" />
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#64748B" />
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFFFF" />
+        <SolidColorBrush x:Key="SurfaceAltBrush" Color="#F8FAFC" />
+        <SolidColorBrush x:Key="BorderBrush" Color="#DCE4EF" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#0F5FFF" />
+        <SolidColorBrush x:Key="AccentSoftBrush" Color="#E8F0FF" />
+        <SolidColorBrush x:Key="AccentDeepBrush" Color="#0B3C8A" />
+
+        <Style x:Key="SurfaceCardStyle" TargetType="Border">
+            <Setter Property="Padding" Value="24" />
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="28" />
+        </Style>
+
+        <Style x:Key="StepCardStyle" TargetType="Border">
+            <Setter Property="Padding" Value="18" />
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}" />
+            <Setter Property="BorderBrush" Value="#E4EAF4" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="22" />
+        </Style>
+
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        </Style>
+
+        <Style x:Key="BodyTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <Style x:Key="FormLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        </Style>
+
+        <Style x:Key="ActionButtonBaseStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="16"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.93" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.82" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.42" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ActionButtonBaseStyle}">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+        </Style>
+
+        <Style x:Key="SecondaryButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ActionButtonBaseStyle}">
+            <Setter Property="Foreground" Value="{StaticResource AccentDeepBrush}" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="InputBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="16">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="InputBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="InputBorder" Property="BorderBrush" Value="#B9C6DB" />
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter TargetName="InputBorder" Property="Background" Value="#F8FAFC" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F3F6FA" Offset="0" />
+            <GradientStop Color="#EDF3F8" Offset="1" />
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Grid>
+        <Grid IsHitTestVisible="False">
+            <Ellipse Width="360"
+                     Height="360"
+                     Margin="-140,-120,0,0"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Top"
+                     Fill="#48DCEBFF" />
+            <Ellipse Width="440"
+                     Height="440"
+                     Margin="0,0,-180,-220"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Bottom"
+                     Fill="#35C7E7D3" />
+        </Grid>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <Grid Margin="28">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="28" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Padding="32"
+                        CornerRadius="32">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#0F172A" Offset="0" />
+                            <GradientStop Color="#17499C" Offset="0.55" />
+                            <GradientStop Color="#1A8A98" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.5*" />
+                            <ColumnDefinition Width="28" />
+                            <ColumnDefinition Width="0.95*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel>
+                            <Border Padding="12,6"
+                                    HorizontalAlignment="Left"
+                                    Background="#19FFFFFF"
+                                    BorderBrush="#24FFFFFF"
+                                    BorderThickness="1"
+                                    CornerRadius="999">
+                                <TextBlock FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           Text="ColorfulSvg / WPF DrawingImage Demo" />
+                            </Border>
+
+                            <TextBlock Margin="0,24,0,0"
+                                       FontSize="38"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"
+                                       Text="让彩色 SVG 在 WPF 里像普通资源一样工作" />
+
+                            <TextBlock Margin="0,14,0,0"
+                                       FontSize="15"
+                                       Foreground="#D9E6FF"
+                                       Text="主界面重新整理为“资源画廊 + 转换工作区 + 实时预览”的结构。左侧展示内置 DrawingImage，右侧可把任意 SVG 转为 XAML 资源字典并立即验证效果。" />
+
+                            <WrapPanel Margin="0,28,0,0">
+                                <Border Width="156"
+                                        Margin="0,0,16,16"
+                                        Padding="16"
+                                        Background="#14FFFFFF"
+                                        BorderBrush="#26FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="22">
+                                    <StackPanel>
+                                        <TextBlock FontSize="28"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White"
+                                                   Text="{Binding IconCards.Count}" />
+                                        <TextBlock Margin="0,6,0,0"
+                                                   Foreground="#D8E4F8"
+                                                   Text="内置资源示例" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Width="156"
+                                        Margin="0,0,16,16"
+                                        Padding="16"
+                                        Background="#14FFFFFF"
+                                        BorderBrush="#26FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="22">
+                                    <StackPanel>
+                                        <TextBlock FontSize="28"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White"
+                                                   Text="XAML" />
+                                        <TextBlock Margin="0,6,0,0"
+                                                   Foreground="#D8E4F8"
+                                                   Text="资源字典输出" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Width="156"
+                                        Margin="0,0,16,16"
+                                        Padding="16"
+                                        Background="#14FFFFFF"
+                                        BorderBrush="#26FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="22">
+                                    <StackPanel>
+                                        <TextBlock FontSize="28"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White"
+                                                   Text="WPF" />
+                                        <TextBlock Margin="0,6,0,0"
+                                                   Foreground="#D8E4F8"
+                                                   Text="Image.Source 直连" />
+                                    </StackPanel>
+                                </Border>
+                            </WrapPanel>
+                        </StackPanel>
+
+                        <Border Grid.Column="2"
+                                Padding="26"
+                                Background="#14FFFFFF"
+                                BorderBrush="#24FFFFFF"
+                                BorderThickness="1"
+                                CornerRadius="26">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="22" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel>
+                                    <TextBlock FontSize="21"
+                                               FontWeight="SemiBold"
+                                               Foreground="White"
+                                               Text="静态资源接入示例" />
+                                    <TextBlock Margin="0,10,0,0"
+                                               Foreground="#D7E4F8"
+                                               Text="主界面保留最常见的引用方式，方便你一眼确认目标产物长什么样。" />
+                                </StackPanel>
+
+                                <Border Grid.Row="2"
+                                        Padding="22"
+                                        Background="#12020B18"
+                                        BorderBrush="#1FFFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="24">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="72"
+                                                    Height="72"
+                                                    Background="#1FFFFFFF"
+                                                    CornerRadius="20">
+                                                <Image Width="40"
+                                                       Height="40"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Source="{StaticResource folder/open}" />
+                                            </Border>
+
+                                            <StackPanel Margin="16,0,0,0"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock FontSize="17"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="White"
+                                                           Text="folder/open" />
+                                                <TextBlock Margin="0,6,0,0"
+                                                           Foreground="#C8D6F1"
+                                                           Text="DrawingImage 资源键名" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <Border Margin="0,20,0,0"
+                                                Padding="14"
+                                                Background="#16FFFFFF"
+                                                CornerRadius="16">
+                                            <TextBlock FontFamily="Consolas"
+                                                       FontSize="14"
+                                                       Foreground="White"
+                                                       TextWrapping="Wrap">Source="{StaticResource folder/open}"</TextBlock>
+                                        </Border>
+
+                                        <TextBlock Margin="0,18,0,0"
+                                                   Foreground="#D7E4F8"
+                                                   Text="转换后的单文件资源会和这里一样，直接作为 Image.Source、按钮图标或列表项图标复用。" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.18*" />
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="0.92*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Style="{StaticResource SurfaceCardStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="24" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SectionTitleStyle}"
+                                               Text="资源画廊" />
+                                    <TextBlock Margin="0,10,0,0"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               Text="内置资源卡片同时展示图标、用途说明和引用代码。以后扩展更多示例时，这个区域也能继续承载。" />
+                                </StackPanel>
+
+                                <Border Grid.Column="1"
+                                        Padding="12,6"
+                                        VerticalAlignment="Top"
+                                        Background="{StaticResource AccentSoftBrush}"
+                                        CornerRadius="999">
+                                    <TextBlock FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource AccentDeepBrush}"
+                                               Text="{Binding IconCards.Count, StringFormat=内置 {0} 个资源}" />
+                                </Border>
+                            </Grid>
+
+                            <ItemsControl Grid.Row="2"
+                                          ItemsSource="{Binding IconCards}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="230"
+                                                Margin="0,0,18,18"
+                                                Padding="18"
+                                                Background="#FBFCFE"
+                                                BorderBrush="#E6EBF4"
+                                                BorderThickness="1"
+                                                CornerRadius="24"
+                                                ToolTip="{Binding UsageExample}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="16" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="18" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="16" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Border Width="68"
+                                                            Height="68"
+                                                            Background="{Binding AccentBrush}"
+                                                            CornerRadius="20">
+                                                        <Image Width="36"
+                                                               Height="36"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               Source="{Binding Icon}" />
+                                                    </Border>
+
+                                                    <StackPanel Grid.Column="1"
+                                                                Margin="16,0,0,0"
+                                                                VerticalAlignment="Center">
+                                                        <TextBlock FontSize="16"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                                   Text="{Binding Key}" />
+                                                        <TextBlock Margin="0,6,0,0"
+                                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                                   Text="DrawingImage 资源" />
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <TextBlock Grid.Row="2"
+                                                           Style="{StaticResource BodyTextStyle}"
+                                                           Text="{Binding Description}" />
+
+                                                <Border Grid.Row="4"
+                                                        Padding="12"
+                                                        Background="#F1F5FB"
+                                                        CornerRadius="16">
+                                                    <TextBlock FontFamily="Consolas"
+                                                               FontSize="12.5"
+                                                               Foreground="{StaticResource AccentDeepBrush}"
+                                                               Text="{Binding UsageExample}"
+                                                               TextWrapping="Wrap" />
+                                                </Border>
+
+                                                <TextBlock Grid.Row="6"
+                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                           Text="适合直接挂到按钮、树节点、状态标识等场景。" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="24" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Style="{StaticResource SurfaceCardStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="18" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="18" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="22" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="18" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SectionTitleStyle}"
+                                               Text="转换工作区" />
+                                    <TextBlock Margin="0,10,0,0"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               Text="表单按流程拆成三个步骤，路径、键名和状态各自独立，减少眼睛在页面上来回扫的成本。" />
+                                </StackPanel>
+
+                                <Border Grid.Row="2"
+                                        Style="{StaticResource StepCardStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="14" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Width="38"
+                                                Height="38"
+                                                VerticalAlignment="Top"
+                                                Background="{StaticResource AccentSoftBrush}"
+                                                CornerRadius="12">
+                                            <TextBlock HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource AccentDeepBrush}"
+                                                       Text="1" />
+                                        </Border>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Style="{StaticResource FormLabelStyle}"
+                                                       Text="选择 SVG 文件" />
+                                            <TextBlock Margin="0,6,0,0"
+                                                       Style="{StaticResource BodyTextStyle}"
+                                                       Text="选择源文件后，会自动给出建议资源键名和输出文件名。" />
+
+                                            <Button Margin="0,16,0,0"
+                                                    HorizontalAlignment="Left"
+                                                    Click="SelectFile_Click"
+                                                    Style="{StaticResource SecondaryButtonStyle}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                           Height="16"
+                                                           Margin="0,0,8,0"
+                                                           Source="{StaticResource folder/open}" />
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               Text="浏览 SVG 文件" />
+                                                </StackPanel>
+                                            </Button>
+
+                                            <Border Margin="0,16,0,0"
+                                                    Padding="14"
+                                                    Background="White"
+                                                    BorderBrush="#E2E8F0"
+                                                    BorderThickness="1"
+                                                    CornerRadius="16">
+                                                <TextBlock Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Text="{Binding SelectedFilePath}"
+                                                           TextWrapping="Wrap" />
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Border Grid.Row="4"
+                                        Style="{StaticResource StepCardStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="14" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Width="38"
+                                                Height="38"
+                                                VerticalAlignment="Top"
+                                                Background="#FFF3E8"
+                                                CornerRadius="12">
+                                            <TextBlock HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="#B45309"
+                                                       Text="2" />
+                                        </Border>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Style="{StaticResource FormLabelStyle}"
+                                                       Text="定义资源键名" />
+                                            <TextBlock Margin="0,6,0,0"
+                                                       Style="{StaticResource BodyTextStyle}"
+                                                       Text="建议保持简洁且可复用，例如 toolbar/open 或 status/success。" />
+
+                                            <TextBox Margin="0,16,0,0"
+                                                     Style="{StaticResource InputTextBoxStyle}"
+                                                     Text="{Binding SelectedResourceKey, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Border Grid.Row="6"
+                                        Style="{StaticResource StepCardStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="14" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Width="38"
+                                                Height="38"
+                                                VerticalAlignment="Top"
+                                                Background="#E8F7F1"
+                                                CornerRadius="12">
+                                            <TextBlock HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="#047857"
+                                                       Text="3" />
+                                        </Border>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Style="{StaticResource FormLabelStyle}"
+                                                       Text="输出 XAML 资源字典" />
+                                            <TextBlock Margin="0,6,0,0"
+                                                       Style="{StaticResource BodyTextStyle}"
+                                                       Text="你可以保留默认建议路径，也可以指定一个用于测试或提交的目标文件。" />
+
+                                            <Grid Margin="0,16,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="12" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBox Style="{StaticResource InputTextBoxStyle}"
+                                                         Text="{Binding LastOutputPath, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                <Button Grid.Column="2"
+                                                        Click="SelectOutputPath_Click"
+                                                        Style="{StaticResource SecondaryButtonStyle}">
+                                                    <TextBlock Text="选择路径" />
+                                                </Button>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Button Grid.Row="8"
+                                        Height="56"
+                                        Click="ConvertSelectedFile_Click"
+                                        IsEnabled="{Binding CanConvert}"
+                                        Style="{StaticResource PrimaryButtonStyle}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Width="16"
+                                               Height="16"
+                                               Margin="0,0,8,0"
+                                               Source="{StaticResource action/check}" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Text="开始转换并刷新预览" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Border Grid.Row="10"
+                                        Padding="16"
+                                        Background="{Binding StatusBackground}"
+                                        CornerRadius="20">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="14" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Width="44"
+                                                Height="44"
+                                                Background="White"
+                                                CornerRadius="14">
+                                            <Image Width="20"
+                                                   Height="20"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Source="{Binding StatusIcon}" />
+                                        </Border>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock FontSize="15"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{Binding StatusBrush}"
+                                                       Text="{Binding StatusTitle}" />
+                                            <TextBlock Margin="0,6,0,0"
+                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                       Text="{Binding StatusMessage}"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="2"
+                                Style="{StaticResource SurfaceCardStyle}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="18" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="18" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource SectionTitleStyle}"
+                                                   Text="实时预览" />
+                                        <TextBlock Margin="0,10,0,0"
+                                                   Style="{StaticResource BodyTextStyle}"
+                                                   Text="成功转换后，新的 DrawingImage 会立即替换这里的示例图标，便于你确认颜色和轮廓是否正确。" />
+                                    </StackPanel>
+
+                                    <Border Grid.Column="1"
+                                            Padding="12,6"
+                                            VerticalAlignment="Top"
+                                            Background="{StaticResource AccentSoftBrush}"
+                                            CornerRadius="999">
+                                        <TextBlock FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource AccentDeepBrush}"
+                                                   Text="{Binding PreviewKeyLabel}" />
+                                    </Border>
+                                </Grid>
+
+                                <Border Grid.Row="2"
+                                        Padding="22"
+                                        CornerRadius="28">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#F7FAFF" Offset="0" />
+                                            <GradientStop Color="#EEF4FF" Offset="0.55" />
+                                            <GradientStop Color="#E8F8F5" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Grid>
+                                        <Ellipse Width="170"
+                                                 Height="170"
+                                                 HorizontalAlignment="Left"
+                                                 VerticalAlignment="Top"
+                                                 Fill="#5ADBEAFE" />
+                                        <Ellipse Width="210"
+                                                 Height="210"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Bottom"
+                                                 Fill="#46BFEDD8" />
+
+                                        <Border Width="300"
+                                                Height="300"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Background="#E8FFFFFF"
+                                                BorderBrush="#CCFFFFFF"
+                                                BorderThickness="1"
+                                                CornerRadius="32">
+                                            <Grid>
+                                                <Image Width="200"
+                                                       Height="200"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Source="{Binding PreviewImage}" />
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <Border Grid.Row="4"
+                                        Padding="14"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#E6EBF4"
+                                        BorderThickness="1"
+                                        CornerRadius="18">
+                                    <TextBlock Foreground="{StaticResource TextSecondaryBrush}"
+                                               Text="{Binding PreviewHint}"
+                                               TextWrapping="Wrap" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>

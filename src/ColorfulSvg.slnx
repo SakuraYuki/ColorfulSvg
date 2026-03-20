@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ColorfulSvg.Cli/ColorfulSvg.Cli.csproj" />
+  <Project Path="ColorfulSvg.Core/ColorfulSvg.Core.csproj" />
+  <Project Path="ColorfulSvg.Demo/ColorfulSvg.Demo.csproj" />
+  <Project Path="ColorfulSvg.IconSearcher/ColorfulSvg.IconSearcher.csproj" />
+</Solution>
