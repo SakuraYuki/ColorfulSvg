@@ -1,0 +1,76 @@
+<UserControl x:Class="ColorfulSvg.IconSearcher.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <Grid Margin="0,12,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="18" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <TextBlock Style="{StaticResource SectionTitleStyle}" Text="工具中心" />
+                <TextBlock Margin="0,8,0,0" Style="{StaticResource BodyTextStyle}" Text="主界面现在只负责菜单和 Tab 容器，具体功能页都拆成独立页面组件，后续继续扩展会更清晰。" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="18" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" FontSize="20" Text="图标搜索" />
+                    <TextBlock Margin="0,8,0,0" Style="{StaticResource BodyTextStyle}" Text="打开 yesicon 搜索工作流，在独立 Tab 里完成挑选、预览、导出和工作区管理。" />
+                    <Button x:Name="OpenIconSearchButton" Margin="0,14,0,0" HorizontalAlignment="Left" Padding="12,7">
+                        <TextBlock Text="打开图标搜索" />
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" FontSize="20" Text="浏览 XAML" />
+                    <TextBlock Margin="0,8,0,0" Style="{StaticResource BodyTextStyle}" Text="在独立 Tab 里浏览已导出的 XAML 资源字典，按宫格查看图标并点击复制 Key。" />
+                    <Button x:Name="OpenResourceBrowserButton" Margin="0,14,0,0" HorizontalAlignment="Left" Padding="12,7">
+                        <TextBlock Text="打开浏览 XAML" />
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="4" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" FontSize="20" Text="浏览 SVG" />
+                    <TextBlock Margin="0,8,0,0" Style="{StaticResource BodyTextStyle}" Text="在独立 Tab 里递归查看目录中的 SVG 图标，支持关键词过滤和滑块调节预览尺寸。" />
+                    <Button x:Name="OpenSvgDirectoryBrowserButton" Margin="0,14,0,0" HorizontalAlignment="Left" Padding="12,7">
+                        <TextBlock Text="打开浏览 SVG" />
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="2" Grid.ColumnSpan="5" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionTitleStyle}" FontSize="20" Text="辅助入口" />
+                    <TextBlock Margin="0,8,0,0" Style="{StaticResource BodyTextStyle}" Text="后续更多功能都可以继续按这种方式，从菜单打开成独立 Tab，而不是固定堆在主界面里。" />
+                    <WrapPanel Margin="0,14,0,0">
+                        <Button x:Name="ShowHelpButton" Margin="0,0,10,10" Padding="12,7" Content="使用说明" />
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -67,13 +67,16 @@
                                Text="3. 按住 Ctrl 会自动进入快速选取模式，直接点击图标可把它加入右侧导出列表。" />
                     <TextBlock Margin="0,8,0,0"
                                Foreground="#475569"
-                               Text="4. 在右侧为每个图标调整资源键名，选择导出模式和输出文件。" />
+                               Text="4. 如果想一次加入当前结果页里的图标，也可以在右侧工作区点击“全选当前页”。" />
                     <TextBlock Margin="0,8,0,0"
                                Foreground="#475569"
-                               Text="5. 点击“导出选中资源”，生成可直接合并到 WPF 的 XAML 资源字典。" />
+                               Text="5. 在右侧为每个图标调整资源键名，选择导出模式和输出文件。" />
                     <TextBlock Margin="0,8,0,0"
                                Foreground="#475569"
-                               Text="6. 浏览器会记住上次停留的 yesicon 页面，下次打开时会自动恢复。" />
+                               Text="6. 点击“导出选中资源”，生成可直接合并到 WPF 的 XAML 资源字典。" />
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="#475569"
+                               Text="7. 浏览器会记住上次停留的 yesicon 页面，下次打开时会自动恢复。" />
                 </StackPanel>
             </Border>
 
@@ -99,7 +102,7 @@
                                Text="工作区：可从“视图”菜单或右下角按钮打开，工作区会以悬浮面板方式显示。" />
                     <TextBlock Margin="0,8,0,0"
                                Foreground="#475569"
-                               Text="右侧已选列表：支持修改资源键名、删除单个图标、批量导出。" />
+                               Text="右侧已选列表：支持修改资源键名、删除单个图标、清空已选、全选当前页、下载 SVG ZIP、批量导出。" />
                     <TextBlock Margin="0,8,0,0"
                                Foreground="#475569"
                                Text="顶部说明已精简；需要查看完整用法时，可随时从“帮助 -> 使用说明”打开本页。" />
@@ -112,8 +115,8 @@
             <StackPanel Grid.Row="6"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
-                <Button Width="120"
-                        Padding="14,10"
+                <Button Width="104"
+                        Padding="10,7"
                         Click="Close_Click"
                         Background="#0F5FFF"
                         BorderThickness="0"

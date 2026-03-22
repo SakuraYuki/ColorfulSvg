@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
         xmlns:local="clr-namespace:ColorfulSvg.IconSearcher"
-        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
         Title="IconSearcher"
         Icon="Assets/App.ico"
@@ -16,116 +16,6 @@
         PreviewKeyDown="Window_PreviewKeyDown"
         PreviewKeyUp="Window_PreviewKeyUp"
         WindowStartupLocation="CenterScreen">
-    <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-
-        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A" />
-        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#475569" />
-        <SolidColorBrush x:Key="TextMutedBrush" Color="#64748B" />
-        <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFFFF" />
-        <SolidColorBrush x:Key="SurfaceAltBrush" Color="#F8FAFC" />
-        <SolidColorBrush x:Key="BorderBrush" Color="#DCE4EF" />
-        <SolidColorBrush x:Key="AccentBrush" Color="#0F5FFF" />
-        <SolidColorBrush x:Key="AccentSoftBrush" Color="#E8F0FF" />
-
-        <Style x:Key="CardStyle" TargetType="Border">
-            <Setter Property="Padding" Value="16" />
-            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="18" />
-        </Style>
-
-        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="22" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-        </Style>
-
-        <Style x:Key="BodyTextStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-            <Setter Property="FontSize" Value="14" />
-        </Style>
-
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="18,12" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16">
-                            <ContentPresenter Margin="{TemplateBinding Padding}"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Opacity" Value="0.92" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Opacity" Value="0.82" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Root" Property="Opacity" Value="0.42" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-        </Style>
-
-        <Style x:Key="RoundedTextBoxStyle" TargetType="TextBox">
-            <Setter Property="Background" Value="White" />
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="12,10" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="RoundedComboBoxStyle" TargetType="ComboBox">
-            <Setter Property="Padding" Value="12,10" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-        </Style>
-    </Window.Resources>
-
     <Window.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#F4F7FB" Offset="0" />
@@ -135,561 +25,67 @@
 
     <Grid>
         <Grid IsHitTestVisible="False">
-            <Ellipse Width="420"
-                     Height="420"
-                     Margin="-160,-150,0,0"
-                     HorizontalAlignment="Left"
-                     VerticalAlignment="Top"
-                     Fill="#39DDEBFF" />
-            <Ellipse Width="480"
-                     Height="480"
-                     Margin="0,0,-180,-220"
-                     HorizontalAlignment="Right"
-                     VerticalAlignment="Bottom"
-                     Fill="#2ED6F1D5" />
+            <Ellipse Width="420" Height="420" Margin="-160,-150,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#39DDEBFF" />
+            <Ellipse Width="480" Height="480" Margin="0,0,-180,-220" HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="#2ED6F1D5" />
         </Grid>
 
-        <Grid Margin="14">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="12" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                <Border Grid.Row="0"
-                        Padding="8,6"
-                        Background="#F9FBFE"
-                        BorderBrush="#DCE4EF"
-                        BorderThickness="1"
-                        CornerRadius="18">
-                    <DockPanel LastChildFill="True">
-                        <TextBlock DockPanel.Dock="Right"
-                                   Margin="0,0,14,0"
-                                   VerticalAlignment="Center"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                   Text="IconSearcher" />
-                        <Menu Background="Transparent"
-                              BorderThickness="0">
-                            <MenuItem Header="_资源">
-                                <MenuItem Header="浏览导出 XAML..."
-                                          Click="OpenResourceBrowser_Click" />
-                            </MenuItem>
-                            <MenuItem Header="_视图">
-                                <MenuItem x:Name="WorkspaceMenuItem"
-                                          Header="隐藏工作区"
-                                          Click="ToggleWorkspacePanel_Click" />
-                            </MenuItem>
-                            <MenuItem Header="_帮助">
-                                <MenuItem Header="使用说明"
-                                          Click="ShowHelp_Click" />
-                            </MenuItem>
-                        </Menu>
-                    </DockPanel>
-                </Border>
+            <Menu Grid.Row="0">
+                <MenuItem Header="_菜单">
+                    <MenuItem Header="打开图标搜索" Click="OpenIconSearchTab_Click" />
+                    <MenuItem Header="XAML资源浏览器" Click="OpenResourceBrowser_Click" />
+                    <MenuItem Header="SVG目录浏览器" Click="OpenSvgDirectoryBrowser_Click" />
+                    <Separator />
+                    <MenuItem x:Name="WorkspaceMenuItem" Header="隐藏工作区" Click="ToggleWorkspacePanel_Click" />
+                    <Separator />
+                    <MenuItem Header="使用说明" Click="ShowHelp_Click" />
+                </MenuItem>
+            </Menu>
 
-                <Grid x:Name="MainContentArea"
-                      Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.2*" />
-                    <ColumnDefinition Width="24" />
-                    <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
+            <TabControl x:Name="MainTabs"
+                        Grid.Row="2"
+                        Style="{StaticResource TabControlInLine}"
+                        Margin="0,6,0,0">
+                <TabItem x:Name="DashboardTab" Header="工具中心">
+                    <local:DashboardView x:Name="DashboardPage" Margin="0,8,0,0" />
+                </TabItem>
 
-                <Border Grid.ColumnSpan="3"
-                        Style="{StaticResource CardStyle}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="14" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                <TabItem x:Name="IconSearchTab" Visibility="Collapsed">
+                    <TabItem.Header>
+                        <DockPanel>
+                            <TextBlock VerticalAlignment="Center" Text="图标搜索" />
+                            <Button Width="22" Height="22" Margin="8,0,0,0" Padding="0" VerticalAlignment="Center" Click="CloseIconSearchTab_Click" Content="×" />
+                        </DockPanel>
+                    </TabItem.Header>
+                    <local:IconSearchView x:Name="IconSearchPage" Margin="0,8,0,0" />
+                </TabItem>
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="12" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="12" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="8" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="8" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="12" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                <TabItem x:Name="ResourceBrowserTab" Visibility="Collapsed">
+                    <TabItem.Header>
+                        <DockPanel>
+                            <TextBlock VerticalAlignment="Center" Text="浏览 XAML" />
+                            <Button Width="22" Height="22" Margin="8,0,0,0" Padding="0" VerticalAlignment="Center" Click="CloseResourceBrowserTab_Click" Content="×" />
+                        </DockPanel>
+                    </TabItem.Header>
+                    <local:ResourceDictionaryBrowserView x:Name="ResourceBrowserView" Margin="0,8,0,0" />
+                </TabItem>
 
-                            <TextBox Style="{StaticResource RoundedTextBoxStyle}"
-                                     KeyDown="SearchQueryTextBox_KeyDown"
-                                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
-
-                            <Button Grid.Column="2"
-                                    Click="Search_Click"
-                                    Style="{StaticResource PrimaryButtonStyle}">
-                                <TextBlock Text="打开搜索" />
-                            </Button>
-
-                            <Button x:Name="BrowserBackButton"
-                                    Grid.Column="4"
-                                    Click="BrowserBack_Click"
-                                    Style="{StaticResource SecondaryButtonStyle}">
-                                <TextBlock Text="后退" />
-                            </Button>
-
-                            <Button x:Name="BrowserForwardButton"
-                                    Grid.Column="6"
-                                    Click="BrowserForward_Click"
-                                    Style="{StaticResource SecondaryButtonStyle}">
-                                <TextBlock Text="前进" />
-                            </Button>
-
-                            <Button Grid.Column="8"
-                                    Click="BrowserRefresh_Click"
-                                    Style="{StaticResource SecondaryButtonStyle}">
-                                <TextBlock Text="刷新" />
-                            </Button>
-
-                            <Button x:Name="WorkspaceToggleButton"
-                                    Grid.Column="10"
-                                    Click="ToggleWorkspacePanel_Click"
-                                    Style="{StaticResource SecondaryButtonStyle}">
-                                <TextBlock Text="隐藏工作区" />
-                            </Button>
-                        </Grid>
-
-                        <Border Grid.Row="2"
-                                Padding="8"
-                                Background="#F8FAFC"
-                                BorderBrush="#E6EBF4"
-                                BorderThickness="1"
-                                CornerRadius="22"
-                                MinHeight="720">
-                            <wv2:WebView2 x:Name="BrowserView"
-                                          PreviewMouseLeftButtonDown="BrowserView_PreviewMouseLeftButtonDown" />
-                        </Border>
-                    </Grid>
-                </Border>
-
-                <Border Grid.ColumnSpan="3"
-                        Margin="24,0,0,24"
-                        Padding="12"
-                        Width="340"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Bottom"
-                        Background="#F7FBFF"
-                        BorderBrush="#DCE4EF"
-                        BorderThickness="1"
-                        CornerRadius="16"
-                        Panel.ZIndex="2">
-                    <StackPanel>
-                        <TextBlock FontWeight="SemiBold"
-                                   Foreground="{Binding StatusBrush}"
-                                   Text="{Binding StatusTitle}" />
-                        <TextBlock Margin="0,8,0,0"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                   Text="{Binding StatusMessage}"
-                                   TextWrapping="Wrap" />
-                    </StackPanel>
-                </Border>
-
-                <Button x:Name="WorkspacePeekButton"
-                        Grid.ColumnSpan="3"
-                        Width="120"
-                        Height="46"
-                        Margin="0,0,18,18"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Click="ToggleWorkspacePanel_Click"
-                        Style="{StaticResource PrimaryButtonStyle}"
-                        Visibility="Collapsed"
-                        Panel.ZIndex="3">
-                    <TextBlock Text="打开工作区" />
-                </Button>
-
-                <Border x:Name="WorkspacePopupAnchor"
-                        Grid.ColumnSpan="3"
-                        Width="1"
-                        Height="1"
-                        Margin="0,116,18,0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Background="Transparent" />
-
-                <Popup x:Name="WorkspacePanel"
-                       PlacementTarget="{Binding ElementName=WorkspacePopupAnchor}"
-                       Placement="Left"
-                       AllowsTransparency="True"
-                       PopupAnimation="Fade"
-                       StaysOpen="True">
-                    <Border Width="420"
-                            Height="{Binding ElementName=BrowserView, Path=ActualHeight}"
-                            Background="Transparent">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      CanContentScroll="False">
-                        <Grid>
-                            <Grid.Effect>
-                                <DropShadowEffect BlurRadius="16"
-                                                  ShadowDepth="0"
-                                                  Color="#220F172A" />
-                            </Grid.Effect>
-                            <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="24" />
-                        <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <Border Style="{StaticResource CardStyle}">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="16" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="16" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="16" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="16" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="16" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="18" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel>
-                                    <TextBlock Style="{StaticResource SectionTitleStyle}"
-                                               Text="导出工作区" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               Style="{StaticResource BodyTextStyle}"
-                                               Text="{Binding SelectionSummary}" />
-                                </StackPanel>
-
-                                <Button Grid.Column="1"
-                                        Click="ToggleWorkspacePanel_Click"
-                                        Style="{StaticResource SecondaryButtonStyle}">
-                                    <TextBlock Text="收起" />
-                                </Button>
-                            </Grid>
-
-                            <Border Grid.Row="2"
-                                    Padding="12"
-                                    Background="#FBFCFE"
-                                    BorderBrush="#E6EBF4"
-                                    BorderThickness="1"
-                                    CornerRadius="14">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="10" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel>
-                                        <TextBlock FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                                   Text="当前页面图标" />
-                                        <TextBlock Margin="0,6,0,0"
-                                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                                   Text="{Binding BrowserHint}"
-                                                   TextWrapping="Wrap" />
-                                    </StackPanel>
-
-                                    <Button Grid.Column="2"
-                                            Click="ImportCurrentIcon_Click"
-                                            IsEnabled="{Binding CanImportCurrentIcon}"
-                                            Style="{StaticResource PrimaryButtonStyle}">
-                                        <TextBlock Text="添加当前图标" />
-                                    </Button>
-                                </Grid>
-                            </Border>
-
-                            <TextBlock Grid.Row="4"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimaryBrush}"
-                                       Text="导出方式" />
-
-                            <ComboBox Grid.Row="6"
-                                      DisplayMemberPath="Label"
-                                      ItemsSource="{Binding ExportModes}"
-                                      SelectedItem="{Binding SelectedExportModeOption}"
-                                      Style="{StaticResource RoundedComboBoxStyle}" />
-
-                            <TextBlock Grid.Row="8"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimaryBrush}"
-                                       Text="输出文件" />
-
-                            <Grid Grid.Row="10">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="14" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="18" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="12" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBox Style="{StaticResource RoundedTextBoxStyle}"
-                                             Text="{Binding OutputPath, UpdateSourceTrigger=PropertyChanged}" />
-
-                                    <Button Grid.Column="2"
-                                            Click="BrowseOutputPath_Click"
-                                            Style="{StaticResource SecondaryButtonStyle}">
-                                        <TextBlock Text="选择路径" />
-                                    </Button>
-                                </Grid>
-
-                                <Border Grid.Row="2"
-                                        Padding="10"
-                                        Background="{Binding StatusBackground}"
-                                        CornerRadius="14">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="SemiBold"
-                                                   Foreground="{Binding StatusBrush}"
-                                                   Text="{Binding StatusTitle}" />
-                                        <TextBlock Margin="0,4,0,0"
-                                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                                   Text="{Binding StatusMessage}"
-                                                   TextWrapping="Wrap" />
-                                    </StackPanel>
-                                </Border>
-
-                                <ScrollViewer Grid.Row="4"
-                                              VerticalScrollBarVisibility="Auto">
-                                    <ItemsControl ItemsSource="{Binding SelectedItems}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Border Margin="0,0,0,8"
-                                                        Padding="10"
-                                                        Background="#FBFCFE"
-                                                        BorderBrush="#E6EBF4"
-                                                        BorderThickness="1"
-                                                        CornerRadius="14">
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" />
-                                                            <ColumnDefinition Width="10" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="10" />
-                                                            <ColumnDefinition Width="Auto" />
-                                                        </Grid.ColumnDefinitions>
-
-                                                        <Border Width="40"
-                                                                Height="40"
-                                                                Background="{StaticResource SurfaceAltBrush}"
-                                                                CornerRadius="10">
-                                                            <Image Width="22"
-                                                                   Height="22"
-                                                                   HorizontalAlignment="Center"
-                                                                   VerticalAlignment="Center"
-                                                                   Source="{Binding PreviewImage}" />
-                                                        </Border>
-
-                                                        <StackPanel Grid.Column="2">
-                                                            <TextBlock FontWeight="SemiBold"
-                                                                       Foreground="{StaticResource TextPrimaryBrush}"
-                                                                       Text="{Binding Id}" />
-                                                            <TextBox Margin="0,8,0,0"
-                                                                     Style="{StaticResource RoundedTextBoxStyle}"
-                                                                     Text="{Binding ResourceKey, UpdateSourceTrigger=PropertyChanged}" />
-                                                        </StackPanel>
-
-                                                        <Button Grid.Column="4"
-                                                                VerticalAlignment="Top"
-                                                                Padding="10,8"
-                                                                Click="RemoveSelectedIcon_Click"
-                                                                CommandParameter="{Binding}"
-                                                                Style="{StaticResource SecondaryButtonStyle}">
-                                                            <TextBlock Text="删除" />
-                                                        </Button>
-                                                    </Grid>
-                                                </Border>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </ScrollViewer>
-                            </Grid>
-
-                            <Button Grid.Row="12"
-                                    Click="Export_Click"
-                                    IsEnabled="{Binding CanExport}"
-                                    Style="{StaticResource PrimaryButtonStyle}">
-                                <TextBlock Text="{Binding ExportButtonLabel}" />
-                            </Button>
-                        </Grid>
-                    </Border>
-
-                    <Border Grid.Row="2"
-                            Style="{StaticResource CardStyle}">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="18" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource SectionTitleStyle}"
-                                           Text="当前页面预览" />
-                                <TextBlock Margin="0,8,0,0"
-                                           Style="{StaticResource BodyTextStyle}"
-                                           Text="这里显示当前 yesicon 页面对应图标的 DrawingImage 预览、作者、许可证和关键词。确认合适后，再把它加入右侧导出列表。" />
-                            </StackPanel>
-
-                            <Grid Grid.Row="2">
-                                <TextBlock HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           FontSize="16"
-                                           Foreground="{StaticResource TextMutedBrush}"
-                                           Text="在左侧打开一个 yesicon 图标详情页以查看预览">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding HasActiveResult}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-
-                                <ContentControl Content="{Binding ActiveResult}">
-                                    <ContentControl.ContentTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="18" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="18" />
-                                                    <RowDefinition Height="*" />
-                                                </Grid.RowDefinitions>
-
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <StackPanel>
-                                                        <TextBlock FontSize="20"
-                                                                   FontWeight="SemiBold"
-                                                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                                                   Text="{Binding Id}" />
-                                                        <TextBlock Margin="0,8,0,0"
-                                                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                                                   Text="{Binding CollectionCaption}" />
-                                                    </StackPanel>
-
-                                                    <Border Grid.Column="1"
-                                                            Padding="12,6"
-                                                            Background="{StaticResource AccentSoftBrush}"
-                                                            CornerRadius="999">
-                                                        <TextBlock FontSize="12.5"
-                                                                   FontWeight="SemiBold"
-                                                                   Foreground="{StaticResource AccentBrush}"
-                                                                   Text="{Binding ResourceKey}" />
-                                                    </Border>
-                                                </Grid>
-
-                                                <Border Grid.Row="2"
-                                                        Padding="14"
-                                                        CornerRadius="16">
-                                                    <Border.Background>
-                                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                            <GradientStop Color="#F8FBFF" Offset="0" />
-                                                            <GradientStop Color="#EEF4FF" Offset="0.6" />
-                                                            <GradientStop Color="#E7F8F1" Offset="1" />
-                                                        </LinearGradientBrush>
-                                                    </Border.Background>
-                                                    <Grid>
-                                                        <Border Width="190"
-                                                                Height="190"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalAlignment="Center"
-                                                                Background="#F6FFFFFF"
-                                                                BorderBrush="#CCFFFFFF"
-                                                                BorderThickness="1"
-                                                                CornerRadius="16">
-                                                            <Grid>
-                                                                <Image Width="132"
-                                                                       Height="132"
-                                                                       HorizontalAlignment="Center"
-                                                                       VerticalAlignment="Center"
-                                                                       Source="{Binding PreviewImage}" />
-                                                                <TextBlock HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="{StaticResource TextMutedBrush}"
-                                                                           Text="Loading">
-                                                                    <TextBlock.Style>
-                                                                        <Style TargetType="TextBlock">
-                                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                                            <Style.Triggers>
-                                                                                <DataTrigger Binding="{Binding PreviewImage}" Value="{x:Null}">
-                                                                                    <Setter Property="Visibility" Value="Visible" />
-                                                                                </DataTrigger>
-                                                                            </Style.Triggers>
-                                                                        </Style>
-                                                                    </TextBlock.Style>
-                                                                </TextBlock>
-                                                            </Grid>
-                                                        </Border>
-                                                    </Grid>
-                                                </Border>
-
-                                                <StackPanel Grid.Row="4">
-                                                    <Border Padding="14"
-                                                            Background="#FBFCFE"
-                                                            BorderBrush="#E6EBF4"
-                                                            BorderThickness="1"
-                                                            CornerRadius="14">
-                                                        <StackPanel>
-                                                            <TextBlock Foreground="{StaticResource TextSecondaryBrush}"
-                                                                       Text="{Binding DetailStateLabel}"
-                                                                       TextWrapping="Wrap" />
-                                                            <TextBlock Margin="0,8,0,0"
-                                                                       Foreground="{StaticResource TextSecondaryBrush}"
-                                                                       Text="{Binding AuthorLabel}"
-                                                                       TextWrapping="Wrap" />
-                                                            <TextBlock Margin="0,6,0,0"
-                                                                       Foreground="{StaticResource TextSecondaryBrush}"
-                                                                       Text="{Binding LicenseLabel}"
-                                                                       TextWrapping="Wrap" />
-                                                            <TextBlock Margin="0,6,0,0"
-                                                                       Foreground="{StaticResource TextSecondaryBrush}"
-                                                                       Text="{Binding KeywordLabel}"
-                                                                       TextWrapping="Wrap" />
-                                                        </StackPanel>
-                                                    </Border>
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ContentControl.ContentTemplate>
-                                </ContentControl>
-                            </Grid>
-                        </Grid>
-                            </Border>
-                        </Grid>
-                        </ScrollViewer>
-                    </Border>
-                </Popup>
-            </Grid>
+                <TabItem x:Name="SvgDirectoryBrowserTab" Visibility="Collapsed">
+                    <TabItem.Header>
+                        <DockPanel>
+                            <TextBlock VerticalAlignment="Center" Text="浏览 SVG" />
+                            <Button Width="22" Height="22" Margin="8,0,0,0" Padding="0" VerticalAlignment="Center" Click="CloseSvgDirectoryBrowserTab_Click" Content="×" />
+                        </DockPanel>
+                    </TabItem.Header>
+                    <local:SvgDirectoryBrowserView x:Name="SvgDirectoryBrowserView" Margin="0,8,0,0" />
+                </TabItem>
+            </TabControl>
         </Grid>
     </Grid>
 </Window>

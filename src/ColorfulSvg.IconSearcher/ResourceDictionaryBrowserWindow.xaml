@@ -28,9 +28,9 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="8" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="8" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
@@ -41,7 +41,7 @@
                                TextTrimming="CharacterEllipsis" />
 
                     <Button Grid.Column="2"
-                            Padding="12,8"
+                            Padding="10,6"
                             Click="OpenResourceFile_Click"
                             Background="#0F5FFF"
                             BorderThickness="0"

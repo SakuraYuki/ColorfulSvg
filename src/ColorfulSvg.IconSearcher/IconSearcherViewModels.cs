@@ -12,9 +12,10 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
 
     private string _searchQuery = "folder";
     private string _outputPath = BuildSuggestedOutputPath("folder");
+    private string _resourceKeyPrefix = string.Empty;
     private bool _isBusy;
     private string _statusTitle = "准备就绪";
-    private string _statusMessage = "输入关键词后即可从 yesicon 搜索图标，并导出为 WPF ResourceDictionary。";
+    private string _statusMessage = "输入关键词后即可从 yesicon 搜索图标，或导入本地 SVG，并导出为 WPF ResourceDictionary。";
     private Brush _statusBrush = InfoBrush;
     private Brush _statusBackground = InfoBackgroundBrush;
     private IconSearchResultItemViewModel? _activeResult;
@@ -22,7 +23,7 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
     private CollectionFilterChoice _selectedCollectionFilter;
     private IReadOnlyList<IconSearchResultItemViewModel> _allSearchResults = [];
     private HashSet<string> _defaultVisibleIds = new(StringComparer.Ordinal);
-    private string _browserHint = "在左侧 yesicon 浏览器中搜索。普通点击进入详情页，按住 Ctrl 再左键点击图标可直接在右侧预览。";
+    private string _browserHint = "在左侧 yesicon 浏览器中搜索，或在右侧导入本地 SVG 文件。普通点击进入详情页，按住 Ctrl 再左键点击图标可直接在右侧预览。";
     private bool _canImportCurrentIcon;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -96,6 +97,12 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
         set => SetField(ref _outputPath, value);
     }
 
+    public string ResourceKeyPrefix
+    {
+        get => _resourceKeyPrefix;
+        set => SetField(ref _resourceKeyPrefix, value);
+    }
+
     public bool IsBusy
     {
         get => _isBusy;
@@ -105,6 +112,9 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
             {
                 OnPropertyChanged(nameof(CanSearch));
                 OnPropertyChanged(nameof(CanExport));
+                OnPropertyChanged(nameof(CanClearSelectedItems));
+                OnPropertyChanged(nameof(CanSelectAllCurrentPage));
+                OnPropertyChanged(nameof(CanImportLocalSvgFiles));
                 OnPropertyChanged(nameof(SearchButtonLabel));
                 OnPropertyChanged(nameof(ExportButtonLabel));
             }
@@ -165,6 +175,12 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
 
     public bool CanExport => !IsBusy && SelectedItems.Count > 0;
 
+    public bool CanClearSelectedItems => !IsBusy && SelectedItems.Count > 0;
+
+    public bool CanSelectAllCurrentPage => !IsBusy;
+
+    public bool CanImportLocalSvgFiles => !IsBusy;
+
     public bool CanChooseCollectionFilter => CollectionFilters.Count > 1;
 
     public string SearchButtonLabel => IsBusy ? "搜索中..." : "搜索图标";
@@ -218,6 +234,7 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(CanChooseCollectionFilter));
         OnPropertyChanged(nameof(SelectionSummary));
         OnPropertyChanged(nameof(CanExport));
+        OnPropertyChanged(nameof(CanClearSelectedItems));
     }
 
     public IReadOnlyList<IconSearchResultItemViewModel> GetVisibleResults()
@@ -230,6 +247,12 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
         return SelectedItems.FirstOrDefault(item => string.Equals(item.Id, iconId, StringComparison.Ordinal));
     }
 
+    public IconSearchResultItemViewModel? FindSelectedItemBySourceId(string sourceId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourceId);
+        return SelectedItems.FirstOrDefault(item => string.Equals(item.SourceId, sourceId, StringComparison.OrdinalIgnoreCase));
+    }
+
     public void AddSelectedItem(IconSearchResultItemViewModel item)
     {
         if (!SelectedItems.Contains(item))
@@ -240,6 +263,7 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
         item.IsSelectedForExport = true;
         OnPropertyChanged(nameof(SelectionSummary));
         OnPropertyChanged(nameof(CanExport));
+        OnPropertyChanged(nameof(CanClearSelectedItems));
     }
 
     public void RemoveSelectedItem(IconSearchResultItemViewModel item)
@@ -249,7 +273,27 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
             item.IsSelectedForExport = false;
             OnPropertyChanged(nameof(SelectionSummary));
             OnPropertyChanged(nameof(CanExport));
+            OnPropertyChanged(nameof(CanClearSelectedItems));
         }
+    }
+
+    public void ClearSelectedItems()
+    {
+        var items = SelectedItems.ToArray();
+        if (items.Length == 0)
+        {
+            return;
+        }
+
+        foreach (var item in items)
+        {
+            SelectedItems.Remove(item);
+            item.IsSelectedForExport = false;
+        }
+
+        OnPropertyChanged(nameof(SelectionSummary));
+        OnPropertyChanged(nameof(CanExport));
+        OnPropertyChanged(nameof(CanClearSelectedItems));
     }
 
     private void SearchResult_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -273,6 +317,7 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
 
         OnPropertyChanged(nameof(SelectionSummary));
         OnPropertyChanged(nameof(CanExport));
+        OnPropertyChanged(nameof(CanClearSelectedItems));
     }
 
     private void ApplyCollectionFilter()
@@ -339,6 +384,7 @@ internal sealed class IconSearcherViewModel : INotifyPropertyChanged
 internal sealed class IconSearchResultItemViewModel : INotifyPropertyChanged
 {
     private string _resourceKey;
+    private string? _sourceId;
     private bool _isSelectedForExport;
     private bool _isLoadingDetails = true;
     private bool _hasLoadedDetails;
@@ -362,6 +408,12 @@ internal sealed class IconSearchResultItemViewModel : INotifyPropertyChanged
     public Task? DetailsTask { get; set; }
 
     public string Id => Candidate.Id;
+
+    public string SourceId
+    {
+        get => string.IsNullOrWhiteSpace(_sourceId) ? Id : _sourceId;
+        set => SetField(ref _sourceId, value);
+    }
 
     public string Prefix => Candidate.Prefix;
 

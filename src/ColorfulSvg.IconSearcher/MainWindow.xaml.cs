@@ -206,10 +206,11 @@ public partial class MainWindow : Window
     private readonly IconSearcherViewModel _viewModel = new();
     private readonly YesIconClient _yesIconClient = new();
     private readonly IconExportService _exportService = new();
+    private readonly SvgZipExportService _svgZipExportService = new();
     private readonly HashSet<string> _browserKnownPickedIconIds = new(StringComparer.Ordinal);
     private CancellationTokenSource? _browserNavigationCancellationTokenSource;
     private HelpWindow? _helpWindow;
-    private ResourceDictionaryBrowserWindow? _resourceDictionaryBrowserWindow;
+    private double _workspacePanelWidth = 200;
     private bool _outputPathCustomized;
     private bool _browserInitialized;
     private bool _browserPickModeEnabled;
@@ -219,9 +220,57 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = _viewModel;
+        WirePageEvents();
         SetWorkspacePanelVisibility(true);
+        DashboardTab.IsSelected = true;
         Loaded += Window_Loaded;
         Deactivated += MainWindow_Deactivated;
+    }
+
+    private IconSearchView IconSearchPageView => IconSearchPage;
+
+    private DashboardView DashboardPageView => DashboardPage;
+
+    private Microsoft.Web.WebView2.Wpf.WebView2 BrowserView => IconSearchPageView.BrowserViewControl;
+
+    private Button BrowserBackButton => IconSearchPageView.BrowserBackButtonControl;
+
+    private Button BrowserForwardButton => IconSearchPageView.BrowserForwardButtonControl;
+
+    private Button WorkspaceToggleButton => IconSearchPageView.WorkspaceToggleButtonControl;
+
+    private Button WorkspacePeekButton => IconSearchPageView.WorkspacePeekButtonControl;
+
+    private GridSplitter WorkspaceSplitter => IconSearchPageView.WorkspaceSplitterControl;
+
+    private Border WorkspacePanel => IconSearchPageView.WorkspacePanelControl;
+
+    private ColumnDefinition WorkspaceSpacerColumn => IconSearchPageView.WorkspaceSpacerColumnDefinition;
+
+    private ColumnDefinition WorkspaceColumn => IconSearchPageView.WorkspaceColumnDefinition;
+
+    private void WirePageEvents()
+    {
+        DashboardPageView.OpenIconSearchButtonControl.Click += OpenIconSearchTab_Click;
+        DashboardPageView.OpenResourceBrowserButtonControl.Click += OpenResourceBrowser_Click;
+        DashboardPageView.OpenSvgDirectoryBrowserButtonControl.Click += OpenSvgDirectoryBrowser_Click;
+        DashboardPageView.ShowHelpButtonControl.Click += ShowHelp_Click;
+
+        IconSearchPageView.SearchRequested += Search_Click;
+        IconSearchPageView.BrowserBackRequested += BrowserBack_Click;
+        IconSearchPageView.BrowserForwardRequested += BrowserForward_Click;
+        IconSearchPageView.BrowserRefreshRequested += BrowserRefresh_Click;
+        IconSearchPageView.WorkspaceToggleRequested += ToggleWorkspacePanel_Click;
+        IconSearchPageView.ClearSelectedIconsRequested += ClearSelectedIcons_Click;
+        IconSearchPageView.ImportCurrentIconRequested += ImportCurrentIcon_Click;
+        IconSearchPageView.ImportVisibleIconsRequested += ImportVisibleIcons_Click;
+        IconSearchPageView.ImportLocalSvgFilesRequested += ImportLocalSvgFiles_Click;
+        IconSearchPageView.ApplyResourceKeyPrefixRequested += ApplyResourceKeyPrefix_Click;
+        IconSearchPageView.BrowseOutputPathRequested += BrowseOutputPath_Click;
+        IconSearchPageView.ExportRequested += Export_Click;
+        IconSearchPageView.ExportSvgZipRequested += ExportSvgZip_Click;
+        IconSearchPageView.BrowserPreviewMouseLeftButtonDownRequested += BrowserView_PreviewMouseLeftButtonDown;
+        IconSearchPageView.RemoveSelectedIconRequested += IconSearchPage_RemoveSelectedIconRequested;
     }
 
     protected override void OnClosed(EventArgs e)
@@ -234,12 +283,6 @@ public partial class MainWindow : Window
         {
             _helpWindow.Close();
             _helpWindow = null;
-        }
-
-        if (_resourceDictionaryBrowserWindow is not null)
-        {
-            _resourceDictionaryBrowserWindow.Close();
-            _resourceDictionaryBrowserWindow = null;
         }
 
         base.OnClosed(e);
@@ -398,22 +441,64 @@ public partial class MainWindow : Window
         }
     }
 
+    private void OpenIconSearchTab_Click(object sender, RoutedEventArgs e)
+    {
+        EnsureIconSearchTabOpen();
+    }
+
+    private void CloseIconSearchTab_Click(object sender, RoutedEventArgs e)
+    {
+        SetWorkspacePanelVisibility(false);
+        IconSearchTab.Visibility = Visibility.Collapsed;
+        DashboardTab.IsSelected = true;
+    }
+
+    private void EnsureIconSearchTabOpen()
+    {
+        IconSearchTab.Visibility = Visibility.Visible;
+        IconSearchTab.IsSelected = true;
+    }
+
     private void ToggleWorkspacePanel_Click(object sender, RoutedEventArgs e)
     {
+        EnsureIconSearchTabOpen();
         SetWorkspacePanelVisibility(!_workspacePanelVisible);
     }
 
     private void SetWorkspacePanelVisibility(bool visible)
     {
-        _workspacePanelVisible = visible;
+        if (!visible && WorkspaceColumn.Width.Value > 0)
+        {
+            _workspacePanelWidth = Math.Max(160, WorkspaceColumn.ActualWidth > 0 ? WorkspaceColumn.ActualWidth : WorkspaceColumn.Width.Value);
+        }
 
-        WorkspacePanel.IsOpen = visible;
+        _workspacePanelVisible = visible;
+        ApplyWorkspacePanelVisualState(visible);
+        WorkspacePanel.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        WorkspaceSplitter.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        WorkspaceSpacerColumn.Width = visible ? new GridLength(10) : new GridLength(0);
+        WorkspaceColumn.Width = visible ? new GridLength(_workspacePanelWidth) : new GridLength(0);
+    }
+
+    private void WorkspacePanel_Opened(object? sender, EventArgs e)
+    {
+        ApplyWorkspacePanelVisualState(true);
+    }
+
+    private void WorkspacePanel_Closed(object? sender, EventArgs e)
+    {
+        ApplyWorkspacePanelVisualState(false);
+    }
+
+    private void ApplyWorkspacePanelVisualState(bool visible)
+    {
+        _workspacePanelVisible = visible;
         WorkspacePeekButton.Visibility = visible ? Visibility.Collapsed : Visibility.Visible;
         WorkspaceMenuItem.Header = visible ? "隐藏工作区" : "打开工作区";
 
         if (WorkspaceToggleButton.Content is TextBlock buttonText)
         {
-            buttonText.Text = visible ? "隐藏工作区" : "打开工作区";
+            buttonText.Text = visible ? "收起工作区" : "打开工作区";
         }
     }
 
@@ -440,24 +525,47 @@ public partial class MainWindow : Window
 
     private void OpenResourceBrowser_Click(object sender, RoutedEventArgs e)
     {
-        if (_resourceDictionaryBrowserWindow is not { IsLoaded: true })
+        ResourceBrowserTab.Visibility = Visibility.Visible;
+        ResourceBrowserTab.IsSelected = true;
+
+        if (!ResourceBrowserView.HasLoadedResourceFile)
         {
-            _resourceDictionaryBrowserWindow = new ResourceDictionaryBrowserWindow
-            {
-                Owner = this
-            };
-            _resourceDictionaryBrowserWindow.Closed += (_, _) => _resourceDictionaryBrowserWindow = null;
-            _resourceDictionaryBrowserWindow.Show();
+            ResourceBrowserView.PromptOpenResourceFile();
         }
-        else
+    }
+
+    private void OpenSvgDirectoryBrowser_Click(object sender, RoutedEventArgs e)
+    {
+        SvgDirectoryBrowserTab.Visibility = Visibility.Visible;
+        SvgDirectoryBrowserTab.IsSelected = true;
+
+        if (!SvgDirectoryBrowserView.HasLoadedSource)
         {
-            _resourceDictionaryBrowserWindow.Activate();
+            SvgDirectoryBrowserView.PromptOpenDirectory();
+        }
+    }
+
+    private void CloseResourceBrowserTab_Click(object sender, RoutedEventArgs e)
+    {
+        ResourceBrowserTab.Visibility = Visibility.Collapsed;
+        DashboardTab.IsSelected = true;
+    }
+
+    private void CloseSvgDirectoryBrowserTab_Click(object sender, RoutedEventArgs e)
+    {
+        SvgDirectoryBrowserTab.Visibility = Visibility.Collapsed;
+        DashboardTab.IsSelected = true;
+    }
+
+    private void IconSearchPage_RemoveSelectedIconRequested(object? sender, IconSearchItemEventArgs e)
+    {
+        _viewModel.RemoveSelectedItem(e.Item);
+        if (ReferenceEquals(_viewModel.ActiveResult, e.Item))
+        {
+            _viewModel.ActiveResult = _viewModel.SelectedItems.FirstOrDefault();
         }
 
-        if (!_resourceDictionaryBrowserWindow.HasLoadedResourceFile)
-        {
-            _resourceDictionaryBrowserWindow.PromptOpenResourceFile();
-        }
+        SetInfoStatus("已移除图标", $"'{e.Item.Id}' 已从右侧导出列表移除。");
     }
 
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -549,6 +657,7 @@ public partial class MainWindow : Window
                 return;
             }
 
+            ApplyConfiguredPrefixToItem(_viewModel.ActiveResult);
             _viewModel.AddSelectedItem(_viewModel.ActiveResult);
             _viewModel.BrowserHint = "当前图标已加入导出列表，可以继续浏览并添加更多图标。";
             SetSuccessStatus("已加入导出列表", $"'{_viewModel.ActiveResult.Id}' 已加入右侧导出列表。");
@@ -561,6 +670,410 @@ public partial class MainWindow : Window
         {
             _viewModel.IsBusy = false;
         }
+    }
+
+    private async void ImportVisibleIcons_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_browserInitialized || BrowserView.CoreWebView2 is null)
+        {
+            SetErrorStatus("浏览器尚未就绪", "请等待 yesicon 页面完成初始化后再尝试批量选取。");
+            return;
+        }
+
+        try
+        {
+            _viewModel.IsBusy = true;
+
+            var candidates = await GetCurrentPageIconCandidatesAsync();
+            if (candidates.Count == 0)
+            {
+                if (TryCreateIconCandidate(GetCurrentBrowserUri(), out _))
+                {
+                    SetInfoStatus("当前是详情页", "这个按钮会批量加入当前结果页中的图标。若只想加入当前图标，请点击“添加当前图标”。");
+                }
+                else
+                {
+                    SetInfoStatus("当前页没有可选图标", "请先打开 yesicon 搜索结果页或图标库列表页，再使用“全选当前页”。");
+                }
+
+                return;
+            }
+
+            var newlyAddedItems = new List<IconSearchResultItemViewModel>();
+            var skippedCount = 0;
+
+            foreach (var candidate in candidates)
+            {
+                if (_viewModel.FindSelectedItem(candidate.Id) is not null)
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                var item = GetOrCreateSelectableItem(candidate);
+                ApplyConfiguredPrefixToItem(item);
+                _viewModel.AddSelectedItem(item);
+                newlyAddedItems.Add(item);
+            }
+
+            if (newlyAddedItems.Count == 0)
+            {
+                SetInfoStatus("当前页已全选", $"当前页识别到 {candidates.Count} 个图标，它们已经都在右侧导出列表中了。");
+                return;
+            }
+
+            WarmUpItemDetails(newlyAddedItems);
+            _viewModel.BrowserHint = $"当前页已批量加入 {newlyAddedItems.Count} 个图标。预览会在后台逐步补齐，你可以继续浏览或直接导出。";
+            SetSuccessStatus(
+                "批量选取完成",
+                $"已将当前页 {newlyAddedItems.Count} 个图标加入右侧导出列表，跳过 {skippedCount} 个已存在图标。");
+        }
+        catch (Exception ex)
+        {
+            SetErrorStatus("批量选取失败", ex.Message);
+        }
+        finally
+        {
+            _viewModel.IsBusy = false;
+        }
+    }
+
+    private void ApplyResourceKeyPrefix_Click(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.SelectedItems.Count == 0)
+        {
+            SetInfoStatus("没有可更新的图标", "请先在右侧导出列表添加至少一个图标。");
+            return;
+        }
+
+        var normalizedPrefix = NormalizeResourceKeyPrefix(_viewModel.ResourceKeyPrefix);
+        _viewModel.ResourceKeyPrefix = FormatResourceKeyPrefixForInput(normalizedPrefix);
+
+        var usedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var updatedCount = 0;
+
+        foreach (var item in _viewModel.SelectedItems)
+        {
+            var suffix = ExtractResourceKeySuffix(item.ResourceKey, item.Name);
+            var targetKey = EnsureUniqueResourceKey(BuildResourceKey(normalizedPrefix, suffix), usedKeys);
+            if (!string.Equals(item.ResourceKey, targetKey, StringComparison.Ordinal))
+            {
+                item.ResourceKey = targetKey;
+                updatedCount++;
+            }
+        }
+
+        var prefixSummary = string.IsNullOrWhiteSpace(normalizedPrefix)
+            ? "已清空统一前缀"
+            : $"当前统一前缀：{FormatResourceKeyPrefixForInput(normalizedPrefix)}";
+        SetSuccessStatus("资源键前缀已更新", $"已更新 {updatedCount} 个图标的资源键。{prefixSummary}");
+    }
+
+    private void ImportLocalSvgFiles_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Filter = "SVG 文件 (*.svg)|*.svg|所有文件 (*.*)|*.*",
+            Title = "选择一个或多个 SVG 文件",
+            CheckFileExists = true,
+            Multiselect = true,
+            InitialDirectory = GetInitialDirectory(_viewModel.OutputPath)
+        };
+
+        if (dialog.ShowDialog(this) != true || dialog.FileNames.Length == 0)
+        {
+            return;
+        }
+
+        ImportLocalSvgFiles(dialog.FileNames);
+    }
+
+    private void ImportLocalSvgFiles(IReadOnlyList<string> filePaths)
+    {
+        if (filePaths.Count == 0)
+        {
+            return;
+        }
+
+        _viewModel.IsBusy = true;
+        SetInfoStatus("正在导入本地 SVG", $"准备读取 {filePaths.Count} 个本地 SVG 文件。");
+
+        try
+        {
+            var newlyAddedItems = new List<IconSearchResultItemViewModel>();
+            var skippedCount = 0;
+            var issues = new List<string>();
+
+            foreach (var rawPath in filePaths)
+            {
+                if (string.IsNullOrWhiteSpace(rawPath))
+                {
+                    continue;
+                }
+
+                var fullPath = Path.GetFullPath(rawPath);
+                var existing = _viewModel.FindSelectedItemBySourceId(fullPath);
+                if (existing is not null)
+                {
+                    _viewModel.ActiveResult = existing;
+                    skippedCount++;
+                    continue;
+                }
+
+                try
+                {
+                    var item = CreateLocalSvgItem(fullPath);
+                    _viewModel.AddSelectedItem(item);
+                    _viewModel.ActiveResult = item;
+                    newlyAddedItems.Add(item);
+                }
+                catch (Exception ex)
+                {
+                    issues.Add($"{Path.GetFileName(fullPath)}: {ex.Message}");
+                }
+            }
+
+            if (newlyAddedItems.Count == 0)
+            {
+                var issueSummary = issues.Count == 0
+                    ? string.Empty
+                    : $" 失败详情：{string.Join(" | ", issues.Take(3))}";
+
+                SetInfoStatus(
+                    "没有新增本地 SVG",
+                    $"已跳过 {skippedCount} 个已存在文件。{issueSummary}".Trim());
+                return;
+            }
+
+            _viewModel.BrowserHint = "本地 SVG 已加入右侧导出列表。你可以继续从 yesicon 挑选图标，也可以直接编辑资源键后导出。";
+            var details = issues.Count == 0
+                ? $"已导入 {newlyAddedItems.Count} 个本地 SVG，跳过 {skippedCount} 个已存在文件。右侧导出列表和预览已经更新。"
+                : $"已导入 {newlyAddedItems.Count} 个本地 SVG，跳过 {skippedCount} 个已存在文件，失败 {issues.Count} 个。失败详情：{string.Join(" | ", issues.Take(3))}";
+
+            SetSuccessStatus("本地 SVG 导入完成", details);
+        }
+        finally
+        {
+            _viewModel.IsBusy = false;
+        }
+    }
+
+    private IconSearchResultItemViewModel CreateLocalSvgItem(string filePath)
+    {
+        var fullPath = Path.GetFullPath(filePath);
+        if (!File.Exists(fullPath))
+        {
+            throw new FileNotFoundException("未找到指定的 SVG 文件。", fullPath);
+        }
+
+        var svgContent = File.ReadAllText(fullPath);
+        var displayName = Path.GetFileNameWithoutExtension(fullPath);
+        var candidate = new IconSearchCandidate(
+            BuildUniqueLocalItemId(fullPath),
+            "local",
+            string.IsNullOrWhiteSpace(displayName) ? "svg" : displayName,
+            "本地 SVG");
+
+        var item = new IconSearchResultItemViewModel(candidate)
+        {
+            SourceId = fullPath,
+            ResourceKey = BuildUniqueLocalResourceKey(fullPath)
+        };
+
+        var preview = _exportService.CreatePreview(svgContent, item.ResourceKey);
+        item.ApplyDetail(
+            new IconDetail(
+                candidate.Id,
+                candidate.Prefix,
+                candidate.Name,
+                candidate.CollectionName,
+                svgContent,
+                null,
+                null,
+                null,
+                null,
+                null,
+                []),
+            preview);
+        item.DetailStateLabel = "本地 SVG 已加载并生成预览";
+        item.AuthorLabel = $"来源：{Path.GetFileName(fullPath)}";
+        item.LicenseLabel = $"路径：{fullPath}";
+        item.KeywordLabel = "关键词：本地导入";
+        return item;
+    }
+
+    private string BuildUniqueLocalItemId(string filePath)
+    {
+        var baseName = SanitizeLocalSegment(Path.GetFileNameWithoutExtension(filePath), "svg");
+        var parentName = SanitizeLocalSegment(Path.GetFileName(Path.GetDirectoryName(filePath)), "folder");
+
+        var candidateId = $"local:{baseName}";
+        if (_viewModel.FindSelectedItem(candidateId) is null)
+        {
+            return candidateId;
+        }
+
+        candidateId = $"local:{parentName}/{baseName}";
+        if (_viewModel.FindSelectedItem(candidateId) is null)
+        {
+            return candidateId;
+        }
+
+        var suffix = 2;
+        do
+        {
+            candidateId = $"local:{baseName}-{suffix}";
+            suffix++;
+        }
+        while (_viewModel.FindSelectedItem(candidateId) is not null);
+
+        return candidateId;
+    }
+
+    private string BuildUniqueLocalResourceKey(string filePath)
+    {
+        var normalizedPrefix = NormalizeResourceKeyPrefix(_viewModel.ResourceKeyPrefix);
+        var prefix = string.IsNullOrWhiteSpace(normalizedPrefix) ? "local" : normalizedPrefix;
+        var suffix = SanitizeLocalSegment(Path.GetFileNameWithoutExtension(filePath), "svg");
+        var baseKey = BuildResourceKey(prefix, suffix);
+        return EnsureUniqueResourceKey(
+            baseKey,
+            _viewModel.SelectedItems.Select(static item => item.ResourceKey));
+    }
+
+    private static string SanitizeLocalSegment(string? value, string fallback)
+    {
+        var candidate = string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+        foreach (var invalidChar in Path.GetInvalidFileNameChars())
+        {
+            candidate = candidate.Replace(invalidChar, '_');
+        }
+
+        candidate = candidate.Replace(' ', '-');
+        return string.IsNullOrWhiteSpace(candidate) ? fallback : candidate;
+    }
+
+    private void ApplyConfiguredPrefixToItem(IconSearchResultItemViewModel item)
+    {
+        var normalizedPrefix = NormalizeResourceKeyPrefix(_viewModel.ResourceKeyPrefix);
+        if (string.IsNullOrWhiteSpace(normalizedPrefix))
+        {
+            return;
+        }
+
+        var suffix = ExtractResourceKeySuffix(item.ResourceKey, item.Name);
+        item.ResourceKey = EnsureUniqueResourceKey(
+            BuildResourceKey(normalizedPrefix, suffix),
+            _viewModel.SelectedItems
+                .Where(existing => !ReferenceEquals(existing, item))
+                .Select(static existing => existing.ResourceKey));
+    }
+
+    private static string NormalizeResourceKeyPrefix(string? prefix)
+    {
+        return NormalizeResourceKeyPath(prefix);
+    }
+
+    private static string FormatResourceKeyPrefixForInput(string normalizedPrefix)
+    {
+        return string.IsNullOrWhiteSpace(normalizedPrefix)
+            ? string.Empty
+            : $"{normalizedPrefix}/";
+    }
+
+    private static string ExtractResourceKeySuffix(string? resourceKey, string? fallbackName)
+    {
+        var normalizedKey = NormalizeResourceKeyPath(resourceKey);
+        if (string.IsNullOrWhiteSpace(normalizedKey))
+        {
+            return SanitizeLocalSegment(fallbackName, "icon");
+        }
+
+        var segments = normalizedKey.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (segments.Length <= 1)
+        {
+            return normalizedKey;
+        }
+
+        return string.Join('/', segments.Skip(1));
+    }
+
+    private static string BuildResourceKey(string prefix, string suffix)
+    {
+        var normalizedPrefix = NormalizeResourceKeyPath(prefix);
+        var normalizedSuffix = NormalizeResourceKeyPath(suffix);
+        if (string.IsNullOrWhiteSpace(normalizedSuffix))
+        {
+            normalizedSuffix = "icon";
+        }
+
+        return string.IsNullOrWhiteSpace(normalizedPrefix)
+            ? normalizedSuffix
+            : $"{normalizedPrefix}/{normalizedSuffix}";
+    }
+
+    private static string NormalizeResourceKeyPath(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        return string.Join(
+            '/',
+            value.Replace('\\', '/')
+                .Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+    }
+
+    private static string EnsureUniqueResourceKey(string baseKey, IEnumerable<string> existingKeys)
+    {
+        var usedKeys = new HashSet<string>(
+            existingKeys
+                .Where(static key => !string.IsNullOrWhiteSpace(key))
+                .Select(static key => NormalizeResourceKeyPath(key)),
+            StringComparer.OrdinalIgnoreCase);
+
+        return EnsureUniqueResourceKey(baseKey, usedKeys);
+    }
+
+    private static string EnsureUniqueResourceKey(string baseKey, ISet<string> usedKeys)
+    {
+        var normalizedBaseKey = NormalizeResourceKeyPath(baseKey);
+        if (string.IsNullOrWhiteSpace(normalizedBaseKey))
+        {
+            normalizedBaseKey = "icon";
+        }
+
+        if (usedKeys.Add(normalizedBaseKey))
+        {
+            return normalizedBaseKey;
+        }
+
+        var suffix = 2;
+        while (true)
+        {
+            var candidateKey = $"{normalizedBaseKey}-{suffix}";
+            if (usedKeys.Add(candidateKey))
+            {
+                return candidateKey;
+            }
+
+            suffix++;
+        }
+    }
+
+    private void ClearSelectedIcons_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedCount = _viewModel.SelectedItems.Count;
+        if (selectedCount == 0)
+        {
+            SetInfoStatus("没有可清空的图标", "右侧导出列表当前已经是空的。");
+            return;
+        }
+
+        _viewModel.ClearSelectedItems();
+        _viewModel.BrowserHint = "右侧导出列表已清空，可以继续从当前页面重新挑选图标。";
+        SetInfoStatus("已清空导出列表", $"已从右侧导出列表移除 {selectedCount} 个图标。");
     }
 
     private async void Export_Click(object sender, RoutedEventArgs e)
@@ -594,11 +1107,7 @@ public partial class MainWindow : Window
             }
         }
 
-        var outputPath = string.IsNullOrWhiteSpace(_viewModel.OutputPath)
-            ? IconSearcherViewModel.BuildSuggestedOutputPath(_viewModel.SearchQuery)
-            : _viewModel.OutputPath;
-
-        _viewModel.OutputPath = outputPath;
+        var outputPath = GetResolvedOutputPath();
         _viewModel.IsBusy = true;
         SetInfoStatus("正在导出", "正在补齐详情并生成 ResourceDictionary。");
 
@@ -611,7 +1120,7 @@ public partial class MainWindow : Window
             }
 
             var exportItems = _viewModel.SelectedItems
-                .Select(item => new IconExportItem(item.ResourceKey.Trim(), item.Id, item.SvgContent))
+                .Select(item => new IconExportItem(item.ResourceKey.Trim(), item.SourceId, item.SvgContent))
                 .ToArray();
 
             var summary = _exportService.Export(
@@ -637,6 +1146,65 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             SetErrorStatus("导出失败", ex.Message);
+        }
+        finally
+        {
+            _viewModel.IsBusy = false;
+        }
+    }
+
+    private async void ExportSvgZip_Click(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.SelectedItems.Count == 0)
+        {
+            SetErrorStatus("没有可下载的图标", "请先至少添加一个图标到导出列表。");
+            return;
+        }
+
+        var zipOutputPath = BuildZipOutputPath(GetResolvedOutputPath());
+        var dialog = new SaveFileDialog
+        {
+            Filter = "ZIP 压缩文件 (*.zip)|*.zip|所有文件 (*.*)|*.*",
+            Title = "选择 SVG ZIP 路径",
+            FileName = Path.GetFileName(zipOutputPath),
+            InitialDirectory = GetInitialDirectory(zipOutputPath),
+            DefaultExt = ".zip",
+            AddExtension = true
+        };
+
+        if (dialog.ShowDialog(this) != true)
+        {
+            SetInfoStatus("下载已取消", "没有生成 SVG ZIP 文件。");
+            return;
+        }
+
+        _viewModel.IsBusy = true;
+        SetInfoStatus("正在打包", "正在补齐详情并打包 SVG 文件 ZIP。");
+
+        try
+        {
+            using var exportCancellation = new CancellationTokenSource();
+            foreach (var item in _viewModel.SelectedItems)
+            {
+                await EnsureItemDetailsLoadedAsync(item, exportCancellation.Token);
+            }
+
+            var exportItems = _viewModel.SelectedItems
+                .Select(item => new SvgZipExportItem(item.ResourceKey.Trim(), item.SourceId, item.SvgContent))
+                .ToArray();
+
+            var summary = _svgZipExportService.Export(exportItems, dialog.FileName);
+            var renameSummary = summary.RenamedCount == 0
+                ? string.Empty
+                : $" 自动重命名 {summary.RenamedCount} 项。";
+
+            SetSuccessStatus(
+                "ZIP 已生成",
+                $"已打包 {summary.EntryCount} 个 SVG 文件。输出：{summary.OutputPath}。{renameSummary}".Trim());
+        }
+        catch (Exception ex)
+        {
+            SetErrorStatus("打包 ZIP 失败", ex.Message);
         }
         finally
         {
@@ -874,6 +1442,130 @@ public partial class MainWindow : Window
         return Uri.TryCreate(source, UriKind.Absolute, out var uri) ? uri : BrowserView.Source;
     }
 
+    private async Task<IReadOnlyList<IconSearchCandidate>> GetCurrentPageIconCandidatesAsync()
+    {
+        if (BrowserView.CoreWebView2 is null)
+        {
+            return [];
+        }
+
+        const string script = """
+            (() => {
+              const ignoredPrefixes = new Set(['search', 'api', '_nuxt', 'favicon']);
+              const ids = [];
+              const seen = new Set();
+
+              const isVisible = (element) => {
+                if (!(element instanceof HTMLElement)) {
+                  return false;
+                }
+
+                const rect = element.getBoundingClientRect();
+                if (rect.width <= 0 || rect.height <= 0) {
+                  return false;
+                }
+
+                const style = window.getComputedStyle(element);
+                return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+              };
+
+              for (const anchor of document.querySelectorAll('a[href]')) {
+                if (!isVisible(anchor)) {
+                  continue;
+                }
+
+                let url;
+                try {
+                  url = new URL(anchor.getAttribute('href') || '', window.location.origin);
+                } catch {
+                  continue;
+                }
+
+                if (url.origin !== window.location.origin) {
+                  continue;
+                }
+
+                const parts = url.pathname
+                  .split('/')
+                  .filter(Boolean)
+                  .map(part => decodeURIComponent(part));
+
+                if (parts.length !== 2) {
+                  continue;
+                }
+
+                const [prefix, name] = parts;
+                if (!prefix || !name || ignoredPrefixes.has(prefix)) {
+                  continue;
+                }
+
+                const id = `${prefix}:${name}`;
+                if (seen.has(id)) {
+                  continue;
+                }
+
+                seen.add(id);
+                ids.push(id);
+              }
+
+              return ids;
+            })();
+            """;
+
+        var raw = await BrowserView.ExecuteScriptAsync(script);
+        if (string.IsNullOrWhiteSpace(raw) || string.Equals(raw, "null", StringComparison.OrdinalIgnoreCase))
+        {
+            return [];
+        }
+
+        var iconIds = JsonSerializer.Deserialize<List<string>>(raw, BrowserJsonOptions) ?? [];
+        return iconIds
+            .Where(static id => !string.IsNullOrWhiteSpace(id))
+            .Select(CreateCandidateFromId)
+            .ToArray();
+    }
+
+    private IconSearchResultItemViewModel GetOrCreateSelectableItem(IconSearchCandidate candidate)
+    {
+        var selectedItem = _viewModel.FindSelectedItem(candidate.Id);
+        if (selectedItem is not null)
+        {
+            return selectedItem;
+        }
+
+        if (_viewModel.ActiveResult is { } activeResult &&
+            string.Equals(activeResult.Id, candidate.Id, StringComparison.Ordinal))
+        {
+            return activeResult;
+        }
+
+        return new IconSearchResultItemViewModel(candidate);
+    }
+
+    private void WarmUpItemDetails(IEnumerable<IconSearchResultItemViewModel> items)
+    {
+        foreach (var item in items)
+        {
+            if (item.HasLoadedDetails || item.DetailsTask is { IsCompleted: false })
+            {
+                continue;
+            }
+
+            _ = WarmUpItemDetailsAsync(item);
+        }
+    }
+
+    private async Task WarmUpItemDetailsAsync(IconSearchResultItemViewModel item)
+    {
+        try
+        {
+            await EnsureItemDetailsLoadedAsync(item, CancellationToken.None);
+        }
+        catch
+        {
+        }
+    }
+
     private async Task<BrowserHitTestResult?> HitTestIconLinkAsync(double x, double y)
     {
         if (BrowserView.CoreWebView2 is null)
@@ -999,6 +1691,7 @@ public partial class MainWindow : Window
 
                     var candidate = CreateCandidateFromId(icon.Id);
                     var item = _viewModel.FindSelectedItem(icon.Id) ?? new IconSearchResultItemViewModel(candidate);
+                    ApplyConfiguredPrefixToItem(item);
                     var preview = _exportService.CreatePreview(icon.Svg, item.ResourceKey);
                     item.ApplyDetail(
                         new IconDetail(
@@ -1139,6 +1832,21 @@ public partial class MainWindow : Window
         return string.IsNullOrWhiteSpace(directory)
             ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             : directory;
+    }
+
+    private string GetResolvedOutputPath()
+    {
+        var outputPath = string.IsNullOrWhiteSpace(_viewModel.OutputPath)
+            ? IconSearcherViewModel.BuildSuggestedOutputPath(_viewModel.SearchQuery)
+            : _viewModel.OutputPath;
+
+        _viewModel.OutputPath = outputPath;
+        return outputPath;
+    }
+
+    private static string BuildZipOutputPath(string outputPath)
+    {
+        return Path.ChangeExtension(Path.GetFullPath(outputPath), ".zip");
     }
 
     private void SetInfoStatus(string title, string message)
