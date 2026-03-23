@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
              mc:Ignorable="d">
-    <Grid x:Name="MainContentArea" Margin="0,12,0,0">
+    <Grid x:Name="MainContentArea" Margin="8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1.2*" />
             <ColumnDefinition x:Name="WorkspaceSpacerColumn" Width="10" />
