@@ -6,6 +6,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              FontFamily="Microsoft YaHei UI">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+
     <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -27,6 +31,10 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock x:Name="FilePathTextBlock"
@@ -40,7 +48,20 @@
                         Click="OpenResourceFile_Click"
                         Content="打开 XAML" />
 
-                <Border Grid.Column="4"
+                <Button x:Name="ToggleManagementButton"
+                        Grid.Column="4"
+                        Padding="10,6"
+                        Click="ToggleManagementMode_Click"
+                        Content="进入管理" />
+
+                <Button x:Name="DeleteSelectedButton"
+                        Grid.Column="6"
+                        Padding="10,6"
+                        Click="DeleteSelectedItems_Click"
+                        Visibility="Collapsed"
+                        Content="删除已选" />
+
+                <Border Grid.Column="8"
                         Padding="10,5"
                         Background="#E8F0FF"
                         CornerRadius="999"
@@ -127,39 +148,60 @@
                                 <Border Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=ItemCardWidth}"
                                         Margin="0,0,8,8"
                                         Padding="12"
-                                        Background="#FBFCFE"
-                                        BorderBrush="#E6EBF4"
                                         BorderThickness="1"
                                         CornerRadius="12"
                                         ToolTip="{Binding Key}"
                                         Cursor="Hand"
-                                        MouseLeftButtonUp="CopyKey_Click">
-                                    <StackPanel>
-                                        <Border Padding="10"
-                                                HorizontalAlignment="Center"
-                                                Background="White"
-                                                BorderBrush="#DCE4EF"
-                                                BorderThickness="1"
-                                                CornerRadius="12">
-                                            <Grid Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=IconPreviewSize}"
-                                                  Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=IconPreviewSize}">
-                                                <Image Stretch="Uniform"
-                                                       SnapsToDevicePixels="True"
-                                                       RenderOptions.BitmapScalingMode="HighQuality"
-                                                       Source="{Binding PreviewImage}" />
-                                            </Grid>
-                                        </Border>
+                                        MouseLeftButtonUp="ResourceCard_Click">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#FBFCFE" />
+                                            <Setter Property="BorderBrush" Value="#E6EBF4" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="Background" Value="#EEF4FF" />
+                                                    <Setter Property="BorderBrush" Value="#0F5FFF" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
 
-                                        <TextBlock Margin="0,12,0,0"
-                                                   HorizontalAlignment="Center"
-                                                   Foreground="#0F172A"
-                                                   FontWeight="SemiBold"
-                                                   Text="{Binding Key}"
-                                                   TextAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   TextWrapping="Wrap"
-                                                   MaxHeight="42" />
-                                    </StackPanel>
+                                    <Grid>
+                                        <CheckBox x:Name="SelectionCheckBox"
+                                                  HorizontalAlignment="Right"
+                                                  VerticalAlignment="Top"
+                                                  Visibility="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=IsManagementMode, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                  Focusable="False"
+                                                  PreviewMouseLeftButtonDown="SelectionCheckBox_PreviewMouseLeftButtonDown"
+                                                  IsChecked="{Binding IsSelected, Mode=OneWay}" />
+
+                                        <StackPanel Margin="0,6,0,0">
+                                            <Border Padding="10"
+                                                    HorizontalAlignment="Center"
+                                                    Background="White"
+                                                    BorderBrush="#DCE4EF"
+                                                    BorderThickness="1"
+                                                    CornerRadius="12">
+                                                <Grid Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=IconPreviewSize}"
+                                                      Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=IconPreviewSize}">
+                                                    <Image Stretch="Uniform"
+                                                           SnapsToDevicePixels="True"
+                                                           RenderOptions.BitmapScalingMode="HighQuality"
+                                                           Source="{Binding PreviewImage}" />
+                                                </Grid>
+                                            </Border>
+
+                                            <TextBlock Margin="0,12,0,0"
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="#0F172A"
+                                                       FontWeight="SemiBold"
+                                                       Text="{Binding Key}"
+                                                       TextAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       TextWrapping="Wrap"
+                                                       MaxHeight="42" />
+                                        </StackPanel>
+                                    </Grid>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

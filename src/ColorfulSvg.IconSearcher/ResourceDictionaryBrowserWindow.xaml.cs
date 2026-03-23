@@ -3,6 +3,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.Win32;
 
@@ -31,8 +33,15 @@ public partial class ResourceDictionaryBrowserWindow : Window
         new PropertyMetadata(
             ResourceDictionaryBrowserPreviewSizing.GetCardWidth(ResourceDictionaryBrowserPreviewSizing.DefaultIconPreviewSize)));
 
+    public static readonly DependencyProperty IsManagementModeProperty = DependencyProperty.Register(
+        nameof(IsManagementMode),
+        typeof(bool),
+        typeof(ResourceDictionaryBrowserWindow),
+        new PropertyMetadata(false));
+
     private IReadOnlyList<ResourceDictionaryIconEntry> _allItems = [];
     private string? _currentFilePath;
+    private int _selectedItemCount;
     private readonly DispatcherTimer _searchDebounceTimer = new()
     {
         Interval = TimeSpan.FromMilliseconds(1000)
@@ -43,6 +52,7 @@ public partial class ResourceDictionaryBrowserWindow : Window
         InitializeComponent();
         _searchDebounceTimer.Tick += SearchDebounceTimer_Tick;
         TryRestoreLastOpenedFile();
+        UpdateManagementModeControls();
     }
 
     public double IconPreviewSize
@@ -55,6 +65,12 @@ public partial class ResourceDictionaryBrowserWindow : Window
     {
         get => (double)GetValue(ItemCardWidthProperty);
         private set => SetValue(ItemCardWidthProperty, value);
+    }
+
+    public bool IsManagementMode
+    {
+        get => (bool)GetValue(IsManagementModeProperty);
+        set => SetValue(IsManagementModeProperty, value);
     }
 
     public bool HasLoadedResourceFile => !string.IsNullOrWhiteSpace(_currentFilePath);
@@ -89,7 +105,7 @@ public partial class ResourceDictionaryBrowserWindow : Window
         {
             var items = ResourceDictionaryIconReader.Load(filePath);
             _currentFilePath = Path.GetFullPath(filePath);
-            _allItems = items;
+            ReplaceItems(items);
 
             FilePathTextBlock.Text = _currentFilePath;
             FilePathTextBlock.ToolTip = _currentFilePath;
@@ -99,7 +115,8 @@ public partial class ResourceDictionaryBrowserWindow : Window
         catch (Exception ex)
         {
             _currentFilePath = null;
-            _allItems = [];
+            SetManagementMode(false);
+            ReplaceItems([]);
             FilePathTextBlock.Text = "尚未选择资源文件";
             FilePathTextBlock.ToolTip = null;
             CountTextBlock.Text = "0 个图标";
@@ -110,14 +127,95 @@ public partial class ResourceDictionaryBrowserWindow : Window
         }
     }
 
-    private void CopyKey_Click(object sender, RoutedEventArgs e)
+    private void ToggleManagementMode_Click(object sender, RoutedEventArgs e)
+    {
+        if (_allItems.Count == 0)
+        {
+            return;
+        }
+
+        SetManagementMode(!IsManagementMode);
+        ApplyFilter();
+    }
+
+    private void DeleteSelectedItems_Click(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_currentFilePath))
+        {
+            return;
+        }
+
+        var selectedKeys = _allItems
+            .Where(static item => item.IsSelected)
+            .Select(static item => item.Key)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        if (selectedKeys.Length == 0)
+        {
+            return;
+        }
+
+        var message = selectedKeys.Length == 1
+            ? $"确认删除图标资源“{selectedKeys[0]}”吗？"
+            : $"确认删除选中的 {selectedKeys.Length} 个图标资源吗？";
+        if (MessageBox.Show(
+                this,
+                message,
+                "删除图标资源",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning) != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        try
+        {
+            var result = ResourceDictionaryIconReader.Delete(_currentFilePath, selectedKeys);
+            ReplaceItems(result.Items);
+            if (_allItems.Count == 0)
+            {
+                SetManagementMode(false);
+            }
+
+            ApplyFilter();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, ex.Message, "删除资源失败", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void ResourceCard_Click(object sender, MouseButtonEventArgs e)
     {
         if (sender is not FrameworkElement { DataContext: ResourceDictionaryIconEntry item })
         {
             return;
         }
 
+        if (IsManagementMode)
+        {
+            if (FindAncestor<CheckBox>(e.OriginalSource as DependencyObject) is null)
+            {
+                ToggleItemSelection(item);
+            }
+
+            e.Handled = true;
+            return;
+        }
+
         Clipboard.SetText(item.Key);
+        e.Handled = true;
+    }
+
+    private void SelectionCheckBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: ResourceDictionaryIconEntry item })
+        {
+            return;
+        }
+
+        ToggleItemSelection(item);
+        e.Handled = true;
     }
 
     private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -222,14 +320,107 @@ public partial class ResourceDictionaryBrowserWindow : Window
                 .ToArray();
 
         ResourceItemsControl.ItemsSource = filteredItems;
-        CountTextBlock.Text = terms.Length == 0
-            ? $"{filteredItems.Count} 个图标"
-            : $"{filteredItems.Count} / {_allItems.Count} 个图标";
+        CountTextBlock.Text = BuildCountText(filteredItems.Count, terms.Length > 0);
 
         EmptyStateTextBlock.Visibility = filteredItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         EmptyStateTextBlock.Text = _allItems.Count == 0
             ? "打开一个导出的 XAML 资源文件。"
             : "没有匹配的图标。";
+    }
+
+    private string BuildCountText(int filteredCount, bool hasFilter)
+    {
+        var countText = hasFilter
+            ? $"{filteredCount} / {_allItems.Count} 个图标"
+            : $"{filteredCount} 个图标";
+        var selectedCount = _selectedItemCount;
+
+        return IsManagementMode && selectedCount > 0
+            ? $"{countText}，已选 {selectedCount} 个"
+            : countText;
+    }
+
+    private void ReplaceItems(IReadOnlyList<ResourceDictionaryIconEntry> items)
+    {
+        _allItems = items;
+        _selectedItemCount = _allItems.Count(static item => item.IsSelected);
+        UpdateManagementModeControls();
+    }
+
+    private void SetManagementMode(bool enabled)
+    {
+        IsManagementMode = enabled;
+        if (!enabled)
+        {
+            ClearSelection();
+        }
+
+        UpdateManagementModeControls();
+    }
+
+    private void ClearSelection()
+    {
+        foreach (var item in _allItems.Where(static item => item.IsSelected))
+        {
+            item.ClearSelection();
+        }
+
+        _selectedItemCount = 0;
+        CountTextBlock.Text = BuildCountText(
+            ResourceItemsControl.Items.Count,
+            (SearchTextBox.Text ?? string.Empty).Length > 0);
+    }
+
+    private void UpdateManagementModeControls()
+    {
+        ToggleManagementButton.Content = IsManagementMode ? "退出管理" : "进入管理";
+        ToggleManagementButton.IsEnabled = _allItems.Count > 0;
+        DeleteSelectedButton.Visibility = IsManagementMode ? Visibility.Visible : Visibility.Collapsed;
+
+        DeleteSelectedButton.IsEnabled = _selectedItemCount > 0;
+        DeleteSelectedButton.Content = _selectedItemCount > 0
+            ? $"删除已选 ({_selectedItemCount})"
+            : "删除已选";
+    }
+
+    private void ToggleItemSelection(ResourceDictionaryIconEntry item)
+    {
+        SetItemSelected(item, !item.IsSelected);
+    }
+
+    private void SetItemSelected(ResourceDictionaryIconEntry item, bool isSelected)
+    {
+        if (item.IsSelected == isSelected)
+        {
+            return;
+        }
+
+        item.IsSelected = isSelected;
+        _selectedItemCount += isSelected ? 1 : -1;
+        if (_selectedItemCount < 0)
+        {
+            _selectedItemCount = 0;
+        }
+
+        UpdateManagementModeControls();
+        CountTextBlock.Text = BuildCountText(
+            ResourceItemsControl.Items.Count,
+            (SearchTextBox.Text ?? string.Empty).Length > 0);
+    }
+
+    private static T? FindAncestor<T>(DependencyObject? node) where T : DependencyObject
+    {
+        while (node is not null)
+        {
+            if (node is T target)
+            {
+                return target;
+            }
+
+            node = VisualTreeHelper.GetParent(node);
+        }
+
+        return null;
     }
 
     private static void OnIconPreviewSizeChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
