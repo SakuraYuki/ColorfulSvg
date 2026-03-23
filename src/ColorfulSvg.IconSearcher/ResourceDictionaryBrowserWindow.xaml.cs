@@ -16,6 +16,21 @@ public partial class ResourceDictionaryBrowserWindow : Window
         "IconSearcher",
         "resource-browser-session.json");
 
+    public static readonly DependencyProperty IconPreviewSizeProperty = DependencyProperty.Register(
+        nameof(IconPreviewSize),
+        typeof(double),
+        typeof(ResourceDictionaryBrowserWindow),
+        new PropertyMetadata(
+            ResourceDictionaryBrowserPreviewSizing.DefaultIconPreviewSize,
+            OnIconPreviewSizeChanged));
+
+    public static readonly DependencyProperty ItemCardWidthProperty = DependencyProperty.Register(
+        nameof(ItemCardWidth),
+        typeof(double),
+        typeof(ResourceDictionaryBrowserWindow),
+        new PropertyMetadata(
+            ResourceDictionaryBrowserPreviewSizing.GetCardWidth(ResourceDictionaryBrowserPreviewSizing.DefaultIconPreviewSize)));
+
     private IReadOnlyList<ResourceDictionaryIconEntry> _allItems = [];
     private string? _currentFilePath;
     private readonly DispatcherTimer _searchDebounceTimer = new()
@@ -28,6 +43,18 @@ public partial class ResourceDictionaryBrowserWindow : Window
         InitializeComponent();
         _searchDebounceTimer.Tick += SearchDebounceTimer_Tick;
         TryRestoreLastOpenedFile();
+    }
+
+    public double IconPreviewSize
+    {
+        get => (double)GetValue(IconPreviewSizeProperty);
+        set => SetValue(IconPreviewSizeProperty, NormalizeIconPreviewSize(value));
+    }
+
+    public double ItemCardWidth
+    {
+        get => (double)GetValue(ItemCardWidthProperty);
+        private set => SetValue(ItemCardWidthProperty, value);
     }
 
     public bool HasLoadedResourceFile => !string.IsNullOrWhiteSpace(_currentFilePath);
@@ -65,12 +92,16 @@ public partial class ResourceDictionaryBrowserWindow : Window
             _allItems = items;
 
             FilePathTextBlock.Text = _currentFilePath;
+            FilePathTextBlock.ToolTip = _currentFilePath;
             ApplyFilter();
             PersistLastOpenedFile();
         }
         catch (Exception ex)
         {
+            _currentFilePath = null;
             _allItems = [];
+            FilePathTextBlock.Text = "尚未选择资源文件";
+            FilePathTextBlock.ToolTip = null;
             CountTextBlock.Text = "0 个图标";
             ResourceItemsControl.ItemsSource = null;
             EmptyStateTextBlock.Visibility = Visibility.Visible;
@@ -81,7 +112,7 @@ public partial class ResourceDictionaryBrowserWindow : Window
 
     private void CopyKey_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { CommandParameter: ResourceDictionaryIconEntry item })
+        if (sender is not FrameworkElement { DataContext: ResourceDictionaryIconEntry item })
         {
             return;
         }
@@ -119,6 +150,7 @@ public partial class ResourceDictionaryBrowserWindow : Window
 
             var json = File.ReadAllText(ResourceBrowserSessionStatePath);
             var state = JsonSerializer.Deserialize<ResourceBrowserSessionState>(json);
+            IconPreviewSize = NormalizeIconPreviewSize(state?.IconPreviewSize ?? IconPreviewSize);
             if (string.IsNullOrWhiteSpace(state?.LastOpenedFilePath) ||
                 !File.Exists(state.LastOpenedFilePath))
             {
@@ -149,7 +181,8 @@ public partial class ResourceDictionaryBrowserWindow : Window
 
             var state = new ResourceBrowserSessionState
             {
-                LastOpenedFilePath = _currentFilePath
+                LastOpenedFilePath = _currentFilePath,
+                IconPreviewSize = IconPreviewSize
             };
 
             File.WriteAllText(ResourceBrowserSessionStatePath, JsonSerializer.Serialize(state));
@@ -199,8 +232,30 @@ public partial class ResourceDictionaryBrowserWindow : Window
             : "没有匹配的图标。";
     }
 
+    private static void OnIconPreviewSizeChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+    {
+        if (dependencyObject is not ResourceDictionaryBrowserWindow window ||
+            e.NewValue is not double iconPreviewSize)
+        {
+            return;
+        }
+
+        window.ItemCardWidth = ResourceDictionaryBrowserPreviewSizing.GetCardWidth(iconPreviewSize);
+    }
+
+    private static double NormalizeIconPreviewSize(double value)
+    {
+        return double.IsNaN(value) || double.IsInfinity(value)
+            ? ResourceDictionaryBrowserPreviewSizing.DefaultIconPreviewSize
+            : Math.Clamp(
+                value,
+                ResourceDictionaryBrowserPreviewSizing.MinIconPreviewSize,
+                ResourceDictionaryBrowserPreviewSizing.MaxIconPreviewSize);
+    }
+
     private sealed class ResourceBrowserSessionState
     {
         public string? LastOpenedFilePath { get; init; }
+        public double? IconPreviewSize { get; init; }
     }
 }

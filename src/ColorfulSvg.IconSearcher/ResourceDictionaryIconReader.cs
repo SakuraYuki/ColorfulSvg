@@ -38,7 +38,10 @@ internal static class ResourceDictionaryIconReader
 
             if (dictionary[key] is DrawingImage drawingImage)
             {
-                items.Add(new ResourceDictionaryIconEntry(key.ToString() ?? string.Empty, drawingImage));
+                items.Add(new ResourceDictionaryIconEntry(
+                    key.ToString() ?? string.Empty,
+                    drawingImage,
+                    DrawingImagePreviewFactory.CreatePreviewImage(drawingImage)));
             }
         }
 
@@ -49,4 +52,4 @@ internal static class ResourceDictionaryIconReader
     }
 }
 
-internal sealed record ResourceDictionaryIconEntry(string Key, DrawingImage Image);
+internal sealed record ResourceDictionaryIconEntry(string Key, DrawingImage Image, ImageSource PreviewImage);

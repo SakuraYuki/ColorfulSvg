@@ -2,10 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ColorfulSvg.IconSearcher"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              FontFamily="Microsoft YaHei UI">
-    <Grid Margin="4">
+    <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="10" />
@@ -58,11 +59,42 @@
                 BorderBrush="#DCE4EF"
                 BorderThickness="1"
                 CornerRadius="16">
-            <TextBox x:Name="SearchTextBox"
-                     Padding="12,8"
-                     TextChanged="SearchTextBox_TextChanged"
-                     FontSize="14"
-                     ToolTip="按空格分隔多个关键词，例如：add edit sync" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="18" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="SearchTextBox"
+                         Padding="12,8"
+                         TextChanged="SearchTextBox_TextChanged"
+                         FontSize="14"
+                         ToolTip="按空格分隔多个关键词，例如：add edit sync" />
+
+                <TextBlock Grid.Column="2"
+                           VerticalAlignment="Center"
+                           Foreground="#0F172A"
+                           FontWeight="SemiBold"
+                           Text="图标大小" />
+
+                <Slider Grid.Column="4"
+                        Minimum="24"
+                        Maximum="160"
+                        TickFrequency="4"
+                        IsSnapToTickEnabled="True"
+                        Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=IconPreviewSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Column="6"
+                           VerticalAlignment="Center"
+                           Foreground="#475569"
+                           FontWeight="SemiBold"
+                           Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=IconPreviewSize, StringFormat={}{0:0}}" />
+            </Grid>
         </Border>
 
         <Border Grid.Row="4"
@@ -92,45 +124,42 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Width="148"
+                                <Border Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=ItemCardWidth}"
                                         Margin="0,0,8,8"
-                                        Padding="10"
+                                        Padding="12"
                                         Background="#FBFCFE"
                                         BorderBrush="#E6EBF4"
                                         BorderThickness="1"
-                                        CornerRadius="12">
-                                    <Button Padding="0"
-                                            Click="CopyKey_Click"
-                                            CommandParameter="{Binding}"
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Cursor="Hand">
-                                        <StackPanel>
-                                            <Border Width="64"
-                                                    Height="64"
-                                                    HorizontalAlignment="Center"
-                                                    Background="#F1F5F9"
-                                                    BorderBrush="#DCE4EF"
-                                                    BorderThickness="1"
-                                                    CornerRadius="12">
-                                                <Image Width="30"
-                                                       Height="30"
-                                                       HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"
-                                                       Source="{Binding Image}" />
-                                            </Border>
+                                        CornerRadius="12"
+                                        ToolTip="{Binding Key}"
+                                        Cursor="Hand"
+                                        MouseLeftButtonUp="CopyKey_Click">
+                                    <StackPanel>
+                                        <Border Padding="10"
+                                                HorizontalAlignment="Center"
+                                                Background="White"
+                                                BorderBrush="#DCE4EF"
+                                                BorderThickness="1"
+                                                CornerRadius="12">
+                                            <Grid Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=IconPreviewSize}"
+                                                  Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ResourceDictionaryBrowserView}}, Path=IconPreviewSize}">
+                                                <Image Stretch="Uniform"
+                                                       SnapsToDevicePixels="True"
+                                                       RenderOptions.BitmapScalingMode="HighQuality"
+                                                       Source="{Binding PreviewImage}" />
+                                            </Grid>
+                                        </Border>
 
-                                            <TextBlock Margin="0,10,0,0"
-                                                       HorizontalAlignment="Center"
-                                                       Foreground="#0F172A"
-                                                       FontWeight="SemiBold"
-                                                       Text="{Binding Key}"
-                                                       TextAlignment="Center"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       TextWrapping="Wrap"
-                                                       MaxHeight="42" />
-                                        </StackPanel>
-                                    </Button>
+                                        <TextBlock Margin="0,12,0,0"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="#0F172A"
+                                                   FontWeight="SemiBold"
+                                                   Text="{Binding Key}"
+                                                   TextAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="Wrap"
+                                                   MaxHeight="42" />
+                                    </StackPanel>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
